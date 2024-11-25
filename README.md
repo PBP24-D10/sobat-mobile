@@ -132,11 +132,11 @@ Modul ini memungkinkan pengguna membuat pertanyaan tentang suatu obat. Pertanyaa
 
 ![image](https://github.com/user-attachments/assets/14035d5f-ea92-4136-af4c-d022c0507409)
 
-1. Flutter (Client-Side) Mengirimkan Request:
+### 1. Flutter (Client-Side) Mengirimkan Request:
 
 Flutter mengirimkan suatu request ke web service atau server Django API melalui internet. Request ini biasanya berupa permintaan data (HTTP GET) atau pengiriman data (HTTP POST) dalam format tertentu, seperti JSON.
 
-2. Server Django Menerima Request:
+### 2. Server Django Menerima Request:
 
 Web service atau server Django menerima request dari Flutter dan memprosesnya di sisi server tersebut. Proses ini melibatkan:
 - views.py: Fungsi-fungsi Python yang mengatur logika pemrosesan suatu request. Misalnya, fungsi untuk menampilkan data atau menyimpan data baru.
@@ -145,15 +145,15 @@ Web service atau server Django menerima request dari Flutter dan memprosesnya di
 - Authentication: Digunakan untuk mengelola proses login, logout, dan pendaftaran pengguna secara aman melalui HTTP request dari flutter.
 - DB: Database merupakan sistem yang digunakan Django untuk menyimpan dan mengelola data. Database berinteraksi dengan model, di mana suatu model merepresentasikan suatu relasi pada database di Django.
   
-3. Interaksi dengan Database Backend Django:
+### 3. Interaksi dengan Database Backend Django:
   
 Jika data dibutuhkan, Django akan mengakses database (DB) melalui model untuk membaca atau menyimpan data/informasi. 
 
-4. Response dari Django:
+### 4. Response dari Django:
 
-Setelah memproses request, Django akan membuat response dalam format seperti JSON yang akan dikirim kembali ke Flutter. 
+Setelah memproses request, Django akan membuat response dalam format, seperti JSON, yang akan dikirim kembali ke Flutter. 
 
-5. Flutter Menerima Response:
+### 5. Flutter Menerima Response:
 
 Flutter menerima data dari Django melalui response tersebut. Data ini kemudian digunakan oleh Flutter untuk memperbarui tampilan aplikasi atau melakukan logika lainnya.
 
