@@ -142,7 +142,7 @@ Web service atau server Django menerima request dari Flutter dan memprosesnya di
 - views.py: Fungsi-fungsi Python yang mengatur logika pemrosesan suatu request. Misalnya, fungsi untuk menampilkan data atau menyimpan data baru.
 - Models: Representasi dari struktur database. Django menggunakan model untuk mengatur data yang akan diambil, disimpan, atau dimodifikasi pada database-nya.
 - Serializers: Digunakan untuk mengubah data antara format objek Python dan format JSON atau XML agar dapat dipahami oleh Flutter.
-- Authentication: Digunakan untuk memproses login  & register pada Django API,  
+- Authentication: Authentication: Digunakan untuk mengelola proses login, logout, dan pendaftaran pengguna secara aman melalui HTTP request dari flutter.
 - DB: Database merupakan sistem yang digunakan Django untuk menyimpan dan mengelola data. Database berinteraksi dengan model, di mana suatu model merepresentasikan suatu relasi pada database di Django.
   
 3. Interaksi dengan Database Backend Django:
