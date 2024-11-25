@@ -144,7 +144,7 @@ Web service atau server Django menerima request dari Flutter dan memprosesnya di
 - Serializers: Digunakan untuk mengubah data antara format objek Python dan format JSON atau XML agar dapat dipahami oleh Flutter.
 - Authentication: Digunakan untuk memproses login  & register pada Django API,  
 - DB: Database merupakan sistem yang digunakan Django untuk menyimpan dan mengelola data. Database berinteraksi dengan model, di mana suatu model merepresentasikan suatu relasi pada database di Django.
-- 
+  
 3. Interaksi dengan Database Backend Django:
   
 Jika data dibutuhkan, Django akan mengakses database (DB) melalui model untuk membaca atau menyimpan data/informasi. 
