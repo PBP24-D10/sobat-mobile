@@ -134,7 +134,7 @@ Modul ini memungkinkan pengguna membuat pertanyaan tentang suatu obat. Pertanyaa
 
 ### 1. Flutter (Client-Side) Mengirimkan Request:
 
-Flutter mengirimkan suatu request ke web service atau server Django API melalui internet. Request ini biasanya berupa permintaan data (HTTP GET) atau pengiriman data (HTTP POST) dalam format tertentu, seperti JSON.
+Flutter mengirimkan suatu request ke web service atau server Django API melalui internet (Django REST API). Request ini biasanya menggunakan method HTTP untuk melaksanakan permintaan data (HTTP GET) atau pengiriman data (HTTP POST) dalam format tertentu, seperti JSON. Misalnya, pengambilan data dalam format JSON memerlukan akses terhadap endpoint http://sobat/json/ atau http://localhost:8000/json selama proses pengembangan secara lokal.
 
 ### 2. Server Django Menerima Request:
 
@@ -151,7 +151,7 @@ Jika data dibutuhkan, Django akan mengakses database (DB) melalui model untuk me
 
 ### 4. Response dari Django:
 
-Setelah memproses request, Django akan membuat response dalam format, seperti JSON, yang akan dikirim kembali ke Flutter. 
+Setelah memproses request, Django akan membuat response dalam format tertentu, seperti JSON, yang akan dikirim kembali ke Flutter. 
 
 ### 5. Flutter Menerima Response:
 
