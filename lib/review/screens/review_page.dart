@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'review_card.dart';
+import '../widgets/review_card.dart';
 import 'review_form.dart';
 
 class ReviewPage extends StatefulWidget {
