@@ -4,6 +4,8 @@ import 'package:sobat_mobile/homepage.dart';
 import 'package:sobat_mobile/login_page.dart';
 import 'package:sobat_mobile/logins_page.dart';
 import 'package:sobat_mobile/register_page.dart';
+import 'package:sobat_mobile/review/screens/review_page.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -21,7 +23,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const LoginPage(),
+      home: const ReviewPage(),
     );
   }
 }
