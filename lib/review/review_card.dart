@@ -54,14 +54,12 @@ class ReviewTile extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    // Add functionality for editing the review
                   },
                   child: const Text("Edit"),
                 ),
                 const SizedBox(width: 10),
                 ElevatedButton(
                   onPressed: () {
-                    // Add functionality for deleting the review
                   },
                   child: const Text("Delete"),
                 ),
