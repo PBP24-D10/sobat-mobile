@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'review_card.dart';
+import 'review_form.dart';
 
 class ReviewPage extends StatefulWidget {
   const ReviewPage({super.key});
@@ -65,7 +66,7 @@ class _ReviewPageState extends State<ReviewPage> {
                 const SizedBox(width: 10),
                 ElevatedButton(
                   onPressed: () {
-                    // Add review functionality
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const ReviewFormPage()));
                   },
                   child: const Text('Add Review'),
                 ),
