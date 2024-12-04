@@ -1,6 +1,30 @@
-import 'package:flutter/material.dart';
 import 'package:sobat_mobile/homepage.dart';
-import 'package:sobat_mobile/register_page.dart';
+import 'package:flutter/material.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:sobat_mobile/authentication/register.dart';
+
+void main() {
+  runApp(const LoginApp());
+}
+
+class LoginApp extends StatelessWidget {
+  const LoginApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Login',
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSwatch(
+          primarySwatch: Colors.deepPurple,
+        ).copyWith(secondary: Colors.deepPurple[400]),
+      ),
+      home: const LoginPage(),
+    );
+  }
+}
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -10,11 +34,16 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final TextEditingController _namaController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _roleController = TextEditingController();
+
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Login'),
@@ -69,35 +98,47 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 24.0),
                   ElevatedButton(
                     onPressed: () async {
-                      // Simulasi proses login
+                      String nama = _namaController.text;
                       String username = _usernameController.text;
                       String password = _passwordController.text;
+                      String role = _roleController.text;
 
-                      if (username == "admin" && password == "password") {
-                        // Simulasi login berhasil
+                      // Cek kredensial
+                      // Untuk menyambungkan Android emulator dengan Django pada localhost,
+                      // gunakan URL http://10.0.2.2/
+                      final response = await request
+                          .login("http://127.0.0.1:8000//login_mobile/", {
+                        'nama': nama,
+                        'username': username,
+                        'password': password,
+                        'role': role,
+                      });
+
+                      if (request.loggedIn) {
+                        String message = response['message'];
+                        String uname = response['username'];
+
                         if (context.mounted) {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => MyHomePage()),
+                                builder: (context) => const MyHomePage()),
                           );
                           ScaffoldMessenger.of(context)
                             ..hideCurrentSnackBar()
                             ..showSnackBar(
-                              const SnackBar(
-                                  content: Text(
-                                      "Login berhasil! Selamat datang, admin.")),
+                              SnackBar(
+                                  content:
+                                      Text("$message Selamat datang, $uname.")),
                             );
                         }
                       } else {
-                        // Simulasi login gagal
                         if (context.mounted) {
                           showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
                               title: const Text('Login Gagal'),
-                              content:
-                                  const Text('Username atau password salah.'),
+                              content: Text(response['message']),
                               actions: [
                                 TextButton(
                                   child: const Text('OK'),
@@ -124,7 +165,8 @@ class _LoginPageState extends State<LoginPage> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => RegisterPage()),
+                        MaterialPageRoute(
+                            builder: (context) => const RegisterPage()),
                       );
                     },
                     child: Text(
