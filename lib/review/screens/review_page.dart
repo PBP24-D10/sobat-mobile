@@ -6,7 +6,16 @@ import 'package:sobat_mobile/review/screens/review_form.dart';
 import 'package:sobat_mobile/review/models/review.dart';
 
 class ReviewPage extends StatefulWidget {
-  const ReviewPage({super.key});
+  final String productName;
+  final String productPrice;
+  final String productID;
+
+  const ReviewPage({
+    super.key,
+    required this.productName,
+    required this.productPrice,
+    required this.productID,
+  });
 
   @override
   State<ReviewPage> createState() => _ReviewPageState();
@@ -14,7 +23,7 @@ class ReviewPage extends StatefulWidget {
 
 class _ReviewPageState extends State<ReviewPage> {
   Future<List<Review>> fetchReviews(CookieRequest request) async {
-    var id = 'a95e7d2e-d80d-4016-af7a-56329ba8af07';
+    var id = widget.productID;
     final response = await request.get('http://localhost:8000/review/$id/json/');
     var data = response;
     List<Review> reviewList = [];
@@ -43,13 +52,45 @@ class _ReviewPageState extends State<ReviewPage> {
               child: Text('Failed to load reviews. Please try again.'),
             );
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text(
-                "No Reviews Are Present",
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontStyle: FontStyle.italic,
-                ),
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 10),
+                        Text(
+                          widget.productName,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          widget.productPrice,
+                          style: const TextStyle(
+                            color: Colors.green,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Center(
+                    child: Text(
+                      "No Reviews Are Present",
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ),
+                ]
               ),
             );
           } else {
@@ -63,21 +104,21 @@ class _ReviewPageState extends State<ReviewPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Center(
+                  Center(
                     child: Column(
                       children: [
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         Text(
-                          "Product Name",
-                          style: TextStyle(
+                          widget.productName,
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 20,
                           ),
                         ),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         Text(
-                          "Rp 111,111",
-                          style: TextStyle(
+                          widget.productPrice,
+                          style: const TextStyle(
                             color: Colors.green,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
