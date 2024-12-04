@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 
-class productTile extends StatelessWidget {
-  const productTile({super.key});
+class productTile extends StatefulWidget {
+  int price;
+  String name;
+  productTile({super.key, required this.name, required this.price});
+
+  @override
+  State<productTile> createState() => _productTileState();
+}
+
+class _productTileState extends State<productTile> {
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +30,8 @@ class productTile extends StatelessWidget {
                 width: 180,
                 height: 200,
               ),
-              Text("Shoes"),
-              Text("Price"),
+              Text(widget.name),
+              Text(widget.price.toString()),
               Text("Rating"),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,

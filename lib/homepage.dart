@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:sobat_mobile/daftar_favorite/screens/daftar_favorite.dart';
+import 'package:sobat_mobile/daftar_favorite/widgets/list_product.dart';
+import 'package:sobat_mobile/widgets/left_drawer.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -24,19 +27,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {},
             ),
             IconButton(
-              icon: Icon(Icons.favorite),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: Icon(Icons.question_answer),
-              onPressed: () {},
-            ),
-            IconButton(
               icon: Icon(Icons.store),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: Icon(Icons.shopping_cart),
               onPressed: () {},
             ),
             IconButton(
@@ -48,6 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
+      drawer: LeftDrawer(),
       body: Center(
         child: Text('Hello, world!'),
       ),
