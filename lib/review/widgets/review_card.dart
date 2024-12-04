@@ -1,21 +1,8 @@
 import 'package:flutter/material.dart';
-
-class ReviewItem {
-  final int rating;
-  final String comment;
-  final String userName;
-  final DateTime datePublished;
-
-  ReviewItem({
-    required this.rating,
-    required this.comment,
-    required this.userName,
-    required this.datePublished,
-  });
-}
+import 'package:sobat_mobile/review/models/review.dart';
 
 class ReviewTile extends StatelessWidget {
-  final ReviewItem item;
+  final Review item;
   const ReviewTile(this.item, {super.key});
 
   @override
@@ -30,7 +17,7 @@ class ReviewTile extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "By: ${item.userName}",
+                  "By: ${item.username}",
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 Text(
@@ -46,7 +33,7 @@ class ReviewTile extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              "Date Published: ${item.datePublished.toLocal().toString().split(' ')[0]}",
+              "Date Published: ${item.dateCreated.toLocal().toString().split(' ')[0]}",
               style: const TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 16),
@@ -54,14 +41,12 @@ class ReviewTile extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    // Add functionality for editing the review
                   },
                   child: const Text("Edit"),
                 ),
                 const SizedBox(width: 10),
                 ElevatedButton(
                   onPressed: () {
-                    // Add functionality for deleting the review
                   },
                   child: const Text("Delete"),
                 ),
