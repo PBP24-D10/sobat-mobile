@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sobat_mobile/daftar_favorite/screens/daftar_favorite.dart';
+import 'package:sobat_mobile/drug/screens/list_drugentry.dart';
 import 'package:sobat_mobile/homepage.dart';
 import 'package:sobat_mobile/login_page.dart';
 import 'package:sobat_mobile/logins_page.dart';
