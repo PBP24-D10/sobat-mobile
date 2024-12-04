@@ -11,7 +11,7 @@ class ProductListScreen extends StatefulWidget {
 }
 
 class _ProductListScreenState extends State<ProductListScreen> {
-  late Future<List<ProductEntry>> futureProducts;
+  late Future<List<FavoriteEntry>> futureProducts;
 
   @override
   void initState() {
@@ -19,14 +19,14 @@ class _ProductListScreenState extends State<ProductListScreen> {
     futureProducts = fetchProducts();
   }
 
-  Future<List<ProductEntry>> fetchProducts() async {
+  Future<List<FavoriteEntry>> fetchProducts() async {
     try {
       final response =
           await http.get(Uri.parse('http://127.0.0.1:8000/api/favorites/'));
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        return data.map((json) => ProductEntry.fromJson(json)).toList();
+        return data.map((json) => FavoriteEntry.fromJson(json)).toList();
       } else {
         throw Exception("Failed to load products: ${response.statusCode}");
       }
@@ -41,7 +41,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
       appBar: AppBar(
         title: const Text("Daftar Produk Favorit"),
       ),
-      body: FutureBuilder<List<ProductEntry>>(
+      body: FutureBuilder<List<FavoriteEntry>>(
         future: futureProducts,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {

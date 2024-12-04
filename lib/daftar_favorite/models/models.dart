@@ -1,24 +1,24 @@
 import 'dart:convert';
 
-ProductEntry productEntryFromJson(String str) =>
-    ProductEntry.fromJson(json.decode(str));
+FavoriteEntry FavoriteEntryFromJson(String str) =>
+    FavoriteEntry.fromJson(json.decode(str));
 
-String productEntryToJson(ProductEntry data) => json.encode(data.toJson());
+String FavoriteEntryToJson(FavoriteEntry data) => json.encode(data.toJson());
 
-class ProductEntry {
+class FavoriteEntry {
   String user;
   String product;
   String catatan;
   String id;
 
-  ProductEntry({
+  FavoriteEntry({
     required this.user,
     required this.product,
     required this.catatan,
     required this.id,
   });
 
-  factory ProductEntry.fromJson(Map<String, dynamic> json) => ProductEntry(
+  factory FavoriteEntry.fromJson(Map<String, dynamic> json) => FavoriteEntry(
         id: json["id"],
         user: json["user"],
         product: json["product"],
