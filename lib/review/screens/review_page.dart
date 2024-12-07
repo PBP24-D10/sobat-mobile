@@ -38,6 +38,7 @@ class _ReviewPageState extends State<ReviewPage> {
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
+    String role = request.jsonData['role'];
     return Scaffold(
       appBar: AppBar(
         title: const Text('Reviews'),
@@ -79,6 +80,30 @@ class _ReviewPageState extends State<ReviewPage> {
                         ),
                       ],
                     ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Back'),
+                      ),
+                      const SizedBox(width: 10),
+                      if (role == 'pengguna')
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ReviewFormPage(productID: widget.productID),
+                              ),
+                            );
+                          },
+                          child: const Text('Add Review'),
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 20),
                   const Center(
@@ -137,17 +162,18 @@ class _ReviewPageState extends State<ReviewPage> {
                         child: const Text('Back'),
                       ),
                       const SizedBox(width: 10),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const ReviewFormPage(),
-                            ),
-                          );
-                        },
-                        child: const Text('Add Review'),
-                      ),
+                      if (role == 'pengguna')
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ReviewFormPage(productID: widget.productID),
+                              ),
+                            );
+                          },
+                          child: const Text('Add Review'),
+                        ),
                     ],
                   ),
                   const SizedBox(height: 20),
