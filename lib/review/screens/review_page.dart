@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:sobat_mobile/review/widgets/review_card.dart';
-import 'package:sobat_mobile/review/screens/review_form.dart';
+import 'package:sobat_mobile/review/screens/review_add_form.dart';
 import 'package:sobat_mobile/review/models/review.dart';
 
 class ReviewPage extends StatefulWidget {
@@ -35,6 +35,20 @@ class _ReviewPageState extends State<ReviewPage> {
     return reviewList;
   }
 
+  late Future<List<Review>> _reviewFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _reviewFuture = fetchReviews(context.read<CookieRequest>());
+  }
+
+  void refreshReviews() {
+    setState(() {
+      _reviewFuture = fetchReviews(context.read<CookieRequest>());
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
@@ -44,7 +58,7 @@ class _ReviewPageState extends State<ReviewPage> {
         title: const Text('Reviews'),
       ),
       body: FutureBuilder(
-        future: fetchReviews(request),
+        future: _reviewFuture,
         builder: (context, AsyncSnapshot<List<Review>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -99,7 +113,9 @@ class _ReviewPageState extends State<ReviewPage> {
                               MaterialPageRoute(
                                 builder: (context) => ReviewFormPage(productID: widget.productID),
                               ),
-                            );
+                            ).then((value) {
+                              if (value == true) refreshReviews();
+                            });
                           },
                           child: const Text('Add Review'),
                         ),
@@ -115,7 +131,7 @@ class _ReviewPageState extends State<ReviewPage> {
                       ),
                     ),
                   ),
-                ]
+                ],
               ),
             );
           } else {
@@ -170,7 +186,9 @@ class _ReviewPageState extends State<ReviewPage> {
                               MaterialPageRoute(
                                 builder: (context) => ReviewFormPage(productID: widget.productID),
                               ),
-                            );
+                            ).then((value) {
+                              if (value == true) refreshReviews();
+                            });
                           },
                           child: const Text('Add Review'),
                         ),
@@ -189,7 +207,12 @@ class _ReviewPageState extends State<ReviewPage> {
                   ),
                   const SizedBox(height: 20),
                   Column(
-                    children: reviews.map((review) => ReviewTile(review)).toList(),
+                    children: reviews.map((review) {
+                      return ReviewTile(
+                        review,
+                        onDelete: refreshReviews,
+                      );
+                    }).toList(),
                   ),
                 ],
               ),
