@@ -6,6 +6,8 @@ import 'package:sobat_mobile/authentication/login.dart';
 import 'package:sobat_mobile/review/screens/review_page.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:sobat_mobile/welcome_Page.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -22,12 +24,13 @@ class MyApp extends StatelessWidget {
         return request;
       },
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Sobat',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home: const LoginPage(),
+        home: const WelcomePage(),
       ),
     );
   }
