@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:sobat_mobile/daftar_favorite/screens/daftar_favorite.dart';
+import 'package:sobat_mobile/daftar_favorite/screens/test.dart';
 // import 'package:mental_health_tracker/screens/list_moodentry.dart';
 // import 'package:mental_health_tracker/screens/menu.dart';
 import 'package:sobat_mobile/homepage.dart';
@@ -15,15 +19,17 @@ class LeftDrawer extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.green[300],
             ),
-            child: const Column(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'Solo Obat',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                  style: GoogleFonts.openSans(
+                    textStyle: TextStyle(
+                        fontSize: 30,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold),
                   ),
                 ),
                 Padding(padding: EdgeInsets.all(8)),
@@ -35,11 +41,11 @@ class LeftDrawer extends StatelessWidget {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.home_outlined),
+            leading: const Icon(FontAwesomeIcons.house),
             title: const Text('Halaman Utama'),
             // Bagian redirection ke MyHomePage
             onTap: () {
-              Navigator.pushReplacement(
+              Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => MyHomePage(),
@@ -49,16 +55,16 @@ class LeftDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.favorite),
             title: const Text('Daftar Favorite'),
-            // Bagian redirection ke MoodEntryFormPage
             onTap: () {
-              /*
-      TODO: Buatlah routing ke MoodEntryFormPage di sini,
-      setelah halaman MoodEntryFormPage sudah dibuat.
-      */
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const ProductListScreen()),
+              );
             },
           ),
           ListTile(
-            leading: const Icon(Icons.medication_outlined),
+            leading: const Icon(FontAwesomeIcons.prescriptionBottleMedical),
             title: const Text('Product'),
             onTap: () {
               // Route menu ke halaman mood
@@ -66,6 +72,28 @@ class LeftDrawer extends StatelessWidget {
               //   context,
               //   MaterialPageRoute(builder: (context) => ()),
               // );
+            },
+          ),
+          ListTile(
+            leading: const Icon(FontAwesomeIcons.shop),
+            title: const Text('Store'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const ProductListScreen()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(FontAwesomeIcons.cartShopping),
+            title: const Text('Daftar Favorite'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const ProductListScreen()),
+              );
             },
           ),
         ],

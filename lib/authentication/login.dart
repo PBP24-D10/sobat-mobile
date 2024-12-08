@@ -1,12 +1,9 @@
+import 'package:google_fonts/google_fonts.dart';
 import 'package:sobat_mobile/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:sobat_mobile/authentication/register.dart';
-
-void main() {
-  runApp(const LoginApp());
-}
 
 class LoginApp extends StatelessWidget {
   const LoginApp({super.key});
@@ -39,7 +36,6 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _roleController = TextEditingController();
 
-
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
@@ -48,25 +44,39 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(
         title: const Text('Login'),
       ),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Card(
-            elevation: 8,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.0),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12.0),
+              child: Text(
+                "SOBAT",
+                style: GoogleFonts.openSans(
+                  textStyle: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
+            Text(
+              "Log in on Sobat :)",
+              style: GoogleFonts.openSans(
+                textStyle: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w300,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(15.0),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
-                    'Login',
-                    style: TextStyle(
-                      fontSize: 24.0,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Container(
+                    height: 200,
+                    child: Image.asset("assets/login.png"),
                   ),
                   const SizedBox(height: 30.0),
                   TextField(
@@ -161,26 +171,38 @@ class _LoginPageState extends State<LoginPage> {
                     child: const Text('Login'),
                   ),
                   const SizedBox(height: 36.0),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const RegisterPage()),
-                      );
-                    },
-                    child: Text(
-                      'Don\'t have an account? Register',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontSize: 16.0,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Don\'t have an account?',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontSize: 16.0,
+                        ),
                       ),
-                    ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const RegisterPage()),
+                          );
+                        },
+                        child: Text(
+                          'Register',
+                          style: TextStyle(
+                            color: Colors.green,
+                            fontSize: 16.0,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-          ),
+          ],
         ),
       ),
     );

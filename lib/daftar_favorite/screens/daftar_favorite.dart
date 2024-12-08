@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:sobat_mobile/daftar_favorite/models/models.dart';
 
 class ProductListScreen extends StatefulWidget {
@@ -13,26 +14,24 @@ class ProductListScreen extends StatefulWidget {
 class _ProductListScreenState extends State<ProductListScreen> {
   late Future<List<FavoriteEntry>> futureProducts;
 
-  @override
-  void initState() {
-    super.initState();
-    futureProducts = fetchProducts();
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   futureProducts = fetchProducts();
+  // }
 
-  Future<List<FavoriteEntry>> fetchProducts() async {
-    try {
-      final response =
-          await http.get(Uri.parse('http://127.0.0.1:8000/api/favorites/'));
+  Future<List<FavoriteEntry>> fetchMood(CookieRequest request) async {
+    final response = await request.get('http://127.0.0.1:8000/favorite/json/');
+    var data = response;
 
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        return data.map((json) => FavoriteEntry.fromJson(json)).toList();
-      } else {
-        throw Exception("Failed to load products: ${response.statusCode}");
+    // Melakukan konversi data json menjadi object MoodEntry
+    List<FavoriteEntry> listMood = [];
+    for (var d in data) {
+      if (d != null) {
+        listMood.add(FavoriteEntry.fromJson(d));
       }
-    } catch (e) {
-      throw Exception("Error occurred: $e");
     }
+    return listMood;
   }
 
   @override
@@ -41,8 +40,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
       appBar: AppBar(
         title: const Text("Daftar Produk Favorit"),
       ),
-      body: FutureBuilder<List<FavoriteEntry>>(
-        future: futureProducts,
+      body: FutureBuilder(
+        future: fetchMood(CookieRequest()),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -86,14 +85,14 @@ class _ProductListScreenState extends State<ProductListScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        product.product,
+                        product.fields.product,
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Text(product.catatan),
+                      Text(product.fields.catatan),
                     ],
                   ),
                 );
