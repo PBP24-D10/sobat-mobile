@@ -6,6 +6,7 @@ import 'package:sobat_mobile/daftar_favorite/screens/test.dart';
 // import 'package:mental_health_tracker/screens/list_moodentry.dart';
 // import 'package:mental_health_tracker/screens/menu.dart';
 import 'package:sobat_mobile/homepage.dart';
+import 'package:sobat_mobile/drug/screens/list_drugentry.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -68,10 +69,10 @@ class LeftDrawer extends StatelessWidget {
             title: const Text('Product'),
             onTap: () {
               // Route menu ke halaman mood
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(builder: (context) => ()),
-              // );
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const DrugEntryPage()),
+              );
             },
           ),
           ListTile(
