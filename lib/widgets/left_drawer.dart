@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sobat_mobile/daftar_favorite/screens/daftar_favorite.dart';
 import 'package:sobat_mobile/daftar_favorite/screens/test.dart';
+import 'package:sobat_mobile/forum/screens/forum.dart';
 // import 'package:mental_health_tracker/screens/list_moodentry.dart';
 // import 'package:mental_health_tracker/screens/menu.dart';
 import 'package:sobat_mobile/homepage.dart';
@@ -72,6 +73,17 @@ class LeftDrawer extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const DrugEntryPage()),
+              );
+            },
+          ),
+                    ListTile(
+            leading: const Icon(FontAwesomeIcons.comments),
+            title: const Text('Forum'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const ForumPage()),
               );
             },
           ),

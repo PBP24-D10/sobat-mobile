@@ -189,7 +189,7 @@ class _LoginPageState extends State<LoginPage> {
                                 builder: (context) => const RegisterPage()),
                           );
                         },
-                        child: Text(
+                        child: const Text(
                           'Register',
                           style: TextStyle(
                             color: Colors.green,
