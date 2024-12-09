@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'package:sobat_mobile/drug/models/drug_entry.dart';
+
 List<FavoriteEntry> favoriteEntryFromJson(String str) => List<FavoriteEntry>.from(json.decode(str).map((x) => FavoriteEntry.fromJson(x)));
 
 String favoriteEntryToJson(List<FavoriteEntry> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));

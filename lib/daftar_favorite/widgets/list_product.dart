@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class productTile extends StatefulWidget {
   int price;
   String name;
+
   productTile({super.key, required this.name, required this.price});
 
   @override
@@ -10,7 +11,6 @@ class productTile extends StatefulWidget {
 }
 
 class _productTileState extends State<productTile> {
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -32,7 +32,6 @@ class _productTileState extends State<productTile> {
               ),
               Text(widget.name),
               Text(widget.price.toString()),
-              Text("Rating"),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [Icon(Icons.add)],

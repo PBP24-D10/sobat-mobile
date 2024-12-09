@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:sobat_mobile/daftar_favorite/models/models.dart';
+import 'package:sobat_mobile/daftar_favorite/widgets/list_product.dart';
 
 class ProductListScreen extends StatefulWidget {
   const ProductListScreen({Key? key}) : super(key: key);
@@ -12,7 +13,7 @@ class ProductListScreen extends StatefulWidget {
 }
 
 class _ProductListScreenState extends State<ProductListScreen> {
-  late Future<List<FavoriteEntry>> futureProducts;
+  Map<String, dynamic> productDetailsMap = {};
 
   // @override
   // void initState() {
@@ -29,6 +30,17 @@ class _ProductListScreenState extends State<ProductListScreen> {
     for (var d in data) {
       if (d != null) {
         listMood.add(FavoriteEntry.fromJson(d));
+        String b = d["fields"]["product"];
+
+        final responses =
+            await http.get(Uri.parse('http://127.0.0.1:8000/product/json/$b/'));
+        var test = jsonDecode(responses.body);
+        var fields = test[0]["fields"];
+        productDetailsMap[b] = fields;
+
+        print(productDetailsMap);
+        // var test = responseJson;
+        // print(test);
       }
     }
     return listMood;
@@ -65,6 +77,15 @@ class _ProductListScreenState extends State<ProductListScreen> {
               itemCount: products.length,
               itemBuilder: (context, index) {
                 final product = products[index];
+                String productId = product.fields.product;
+
+                // Get the product details from the map (this should be updated once product data is loaded)
+                // Map<String, dynamic>? productDetails =
+                //     productDetailsMap[productId];
+                // String productName = productDetails != null
+                //     ? productDetails['fields']['name']
+                //     : 'Loading...';
+
                 return Container(
                   margin:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -84,15 +105,20 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        product.fields.product,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(product.fields.catatan),
+                      productTile(
+                          name: productDetailsMap[productId]["name"],
+                          price: productDetailsMap[productId]["price"]),
+                      // Text(
+                      //   productDetailsMap[productId]["name"],
+                      //   style: const TextStyle(
+                      //     fontSize: 18,
+                      //     fontWeight: FontWeight.bold,
+                      //   ),
+                      // ),
+                      // const SizedBox(height: 8),
+                      // Text(product.fields.catatan),
+
+                      // Text(productDetailsMap[productId].name)
                     ],
                   ),
                 );
