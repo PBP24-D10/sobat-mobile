@@ -37,7 +37,7 @@ class DrugEntry {
     String name;
     String desc;
     String category;
-    DrugType drugType;
+    String drugType;
     String drugForm;
     int price;
     String image;
@@ -58,7 +58,7 @@ class DrugEntry {
       name: json["name"] ?? "Unknown",
       desc: json["desc"] ?? "No description available",
       category: json["category"] ?? "Unknown",
-      drugType: drugTypeValues.map[json["drug_type"]] ?? DrugType.MODERN,
+      drugType: json["drug_type"] ?? "Unknown",
       drugForm: json["drug_form"] ?? "Unknown",
       price: json["price"] ?? 0,
       image: json["image"] ?? "",
@@ -70,7 +70,7 @@ class DrugEntry {
         "name": name,
         "desc": desc,
         "category": category,
-        "drug_type": drugTypeValues.reverse[drugType],
+        "drug_type": drugType,
         "drug_form": drugForm,
         "price": price,
         "image": image,
@@ -78,15 +78,15 @@ class DrugEntry {
     };
 }
 
-enum DrugType {
-    MODERN,
-    TRADISIONAL
-}
+// enum DrugType {
+//     MODERN,
+//     TRADISIONAL
+// }
 
-final drugTypeValues = EnumValues({
-    "Modern": DrugType.MODERN,
-    "Tradisional": DrugType.TRADISIONAL
-});
+// final drugTypeValues = EnumValues({
+//     "Modern": DrugType.MODERN,
+//     "Tradisional": DrugType.TRADISIONAL
+// });
 
 enum Model {
     PRODUCT_DRUGENTRY

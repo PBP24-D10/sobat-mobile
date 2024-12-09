@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:sobat_mobile/drug/models/drug_entry.dart';
-// import 'package:grosa/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:sobat_mobile/drug/screens/drug_detail.dart'; 
+import 'package:sobat_mobile/drug/screens/drug_detail.dart';
+import 'package:sobat_mobile/drug/screens/drugentry_form.dart'; // Assuming the form is in this file
+import 'package:http/http.dart' as http;
 
 class DrugEntryPage extends StatefulWidget {
   const DrugEntryPage({super.key});
@@ -15,29 +16,38 @@ class DrugEntryPage extends StatefulWidget {
 class _DrugEntryPageState extends State<DrugEntryPage> {
   Future<List<DrugModel>> fetchProductEntries(CookieRequest request) async {
     final response = await request.get('http://localhost:8000/product/json/');
-
-    // print("Response from API: $response OMG"); // Tambahkan ini untuk debug
-
-    // Melakukan decode response menjadi bentuk json
     var data = response;
 
-    // Melakukan konversi data json menjadi object DrugEntry
     List<DrugModel> listProduct = [];
     for (var d in data) {
       if (d != null) {
         try {
           final entry = DrugModel.fromJson(d);
           listProduct.add(entry);
-          // print("Successfully added: $entry");
         } catch (e) {
-          // print("Error processing entry: $d, Error: $e");
+          // Handle any error during data parsing
         }
       }
     }
-
-      // print("Processed DrugEntry List: $listProduct");
-      return listProduct;
+    return listProduct;
   }
+
+  // Future<bool> deleteProduct(CookieRequest request, String productId) async {
+  //   final response = await request.delete('http://localhost:8000/product/delete/$productId/');
+  //   if (response.statusCode == 200) {
+  //     return true; // Berhasil menghapus
+  //   } else {
+  //     return false; // Gagal menghapus
+  //   }
+  // }
+
+  Future<bool> deleteProduct(String productId) async {
+    final url = 'http://localhost:8000/product/delete-drug/$productId/';
+    final response = await http.get(Uri.parse(url));
+
+    return response.statusCode == 200;
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +56,6 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
       appBar: AppBar(
         title: const Text('Product Entry List'),
       ),
-      // drawer: const LeftDrawer(),
       body: FutureBuilder(
         future: fetchProductEntries(request),
         builder: (context, AsyncSnapshot snapshot) {
@@ -92,7 +101,7 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
                             color: Colors.grey.withOpacity(0.5),
                             spreadRadius: 2,
                             blurRadius: 5,
-                            offset: const Offset(0, 3), // perubahan posisi bayangan
+                            offset: const Offset(0, 3),
                           ),
                         ],
                       ),
@@ -110,6 +119,41 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
                           Text("Deskripsi: ${product.fields.desc}"),
                           const SizedBox(height: 10),
                           Text("Harga: \$${product.fields.price}"),
+                          // Row for edit and delete buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.edit, color: Colors.blue),
+                                onPressed: () {
+                                  // Navigate to edit form, passing the selected product
+                                  // Navigator.push(
+                                    // context,
+                                    // MaterialPageRoute(
+                                    //   builder: (context) => DrugEntryForm(product: product),
+                                    // ),
+                                  // );
+                                },
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.delete, color: Colors.red),
+                                onPressed: () async {
+                                  bool success = await deleteProduct(product.pk.toString());
+                                    if (success) {
+                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                        content: Text('Product successfully deleted'),
+                                      ));
+                                      // Optionally refresh the list or navigate away
+                                    } else {
+                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                        content: Text('Failed to delete product'),
+                                      ));
+                                    }
+                                },
+                                // child: Text('Delete Product'),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
@@ -119,6 +163,17 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
             }
           }
         },
+      ),
+      // Floating action button to navigate to the drug entry form for adding new drug
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddDrugForm()), // Navigate to the add drug form
+          );
+        },
+        child: const Icon(Icons.add),
+        backgroundColor: Colors.blue,
       ),
     );
   }
