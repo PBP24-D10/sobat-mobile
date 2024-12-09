@@ -32,7 +32,6 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _namaController = TextEditingController();
-  final TextEditingController _userController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _roleController = TextEditingController();
@@ -110,7 +109,6 @@ class _LoginPageState extends State<LoginPage> {
                   ElevatedButton(
                     onPressed: () async {
                       String nama = _namaController.text;
-                      String user = _userController.text;
                       String username = _usernameController.text;
                       String password = _passwordController.text;
                       String role = _roleController.text;
@@ -121,7 +119,6 @@ class _LoginPageState extends State<LoginPage> {
                       final response = await request
                           .login("http://127.0.0.1:8000//login_mobile/", {
                         'nama': nama,
-                        'user': user,
                         'username': username,
                         'password': password,
                         'role': role,
