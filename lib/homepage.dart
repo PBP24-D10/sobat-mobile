@@ -8,6 +8,7 @@ import 'package:sobat_mobile/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:sobat_mobile/authentication/login.dart';
+import 'package:sobat_mobile/shop/screens/shop_main_page.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -64,7 +65,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 GButton(
                   icon: FontAwesomeIcons.shop,
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ShopMainPage()
+                      )
+                    );
+
+                  },
                 ),
                 GButton(
                   icon: FontAwesomeIcons.rightFromBracket,
