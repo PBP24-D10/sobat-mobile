@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-
 import 'package:sobat_mobile/daftar_favorite/screens/daftar_favorite.dart';
 import 'package:sobat_mobile/daftar_favorite/widgets/list_product.dart';
 import 'package:sobat_mobile/widgets/left_drawer.dart';
