@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:sobat_mobile/daftar_favorite/models/models.dart';
+import 'package:sobat_mobile/daftar_favorite/widgets/list_product.dart';
 
 class ProductListScreen extends StatefulWidget {
   const ProductListScreen({Key? key}) : super(key: key);
@@ -12,26 +13,73 @@ class ProductListScreen extends StatefulWidget {
 }
 
 class _ProductListScreenState extends State<ProductListScreen> {
-  late Future<List<FavoriteEntry>> futureProducts;
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   futureProducts = fetchProducts();
-  // }
+  final String baseUrl = 'http://localhost:8000/media/';
+  int totalFavorit = 0;
+  Map<String, dynamic> productDetailsMap = {};
+  Map<String, String> productPKMap = {};
+  late Future<void> fetchFuture;
+  @override
+  void initState() {
+    super.initState();
+    fetchFuture = fetchMood(CookieRequest()); // Memuat data awal
+  }
 
   Future<List<FavoriteEntry>> fetchMood(CookieRequest request) async {
     final response = await request.get('http://127.0.0.1:8000/favorite/json/');
     var data = response;
+    print(data);
 
     // Melakukan konversi data json menjadi object MoodEntry
     List<FavoriteEntry> listMood = [];
     for (var d in data) {
       if (d != null) {
+        totalFavorit++;
         listMood.add(FavoriteEntry.fromJson(d));
+        String b = d["fields"]["product"];
+        String pk = d['pk'];
+        productPKMap[b] = pk;
+
+        final responses =
+            await http.get(Uri.parse('http://127.0.0.1:8000/product/json/$b/'));
+        var test = jsonDecode(responses.body);
+        var fields = test[0]["fields"];
+        productDetailsMap[b] = fields;
+
+        // print(productDetailsMap);
+        // var test = responseJson;
+        // print(test);
       }
     }
+    // print(listMood.toString());
     return listMood;
+  }
+
+  Future<void> deleteProduct(String productId) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('http://127.0.0.1:8000/favorite/delete/$productId/'),
+        // headers: {
+        //   'Content-Type': 'application/json',
+        // },
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          productDetailsMap.remove(productId.toString());
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Produk berhasil dihapus!')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal menghapus produk.')),
+        );
+      }
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Terjadi kesalahan: $error')),
+      );
+    }
   }
 
   @override
@@ -61,42 +109,58 @@ class _ProductListScreenState extends State<ProductListScreen> {
             );
           } else {
             final products = snapshot.data!;
-            return ListView.builder(
-              itemCount: products.length,
-              itemBuilder: (context, index) {
-                final product = products[index];
-                return Container(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
-                        spreadRadius: 2,
-                        blurRadius: 5,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [Text("Item : $totalFavorit")],
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        product.fields.product,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(product.fields.catatan),
-                    ],
+                  GridView.builder(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.75,
+                    ),
+                    itemCount: products.length,
+                    itemBuilder: (context, index) {
+                      final product = products[index];
+                      String productId = product.fields.product;
+                      String url = productDetailsMap[productId]["image"];
+                      String imageUrl = '$baseUrl$url';
+                      String productPk = productPKMap[productId] ?? '';
+                      // print("ini pk" + productPk);
+                      // print(productPKMap);
+                      // print(productDetailsMap);
+
+                      // Get the product details from the map (this should be updated once product data is loaded)
+                      // Map<String, dynamic>? productDetails =
+                      //     productDetailsMap[productId];
+                      // String productName = productDetails != null
+                      //     ? productDetails['fields']['name']
+                      //     : 'Loading...';
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // productTile(
+                          //     name: productDetailsMap[productId]["name"],
+                          //     price: productDetailsMap[productId]["price"]),
+                          productTile(
+                            name: productDetailsMap[productId]["name"],
+                            price: productDetailsMap[productId]["price"],
+                            imageUrl: imageUrl,
+                            onPressed: () => deleteProduct(productPk),
+                          ),
+                        ],
+                      );
+                    },
                   ),
-                );
-              },
+                ],
+              ),
             );
           }
         },

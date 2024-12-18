@@ -48,7 +48,6 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
     return response.statusCode == 200;
   }
 
-
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
@@ -80,18 +79,21 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
                 itemCount: snapshot.data!.length,
                 itemBuilder: (_, index) {
                   final product = snapshot.data![index];
+                  // print("test" + product.body);
                   return InkWell(
                     onTap: () {
                       // Navigasi ke halaman detail produk
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ProductDetailPage(product: product),
+                          builder: (context) =>
+                              ProductDetailPage(product: product),
                         ),
                       );
                     },
                     child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
                       padding: const EdgeInsets.all(20.0),
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -128,27 +130,31 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
                                 onPressed: () {
                                   // Navigate to edit form, passing the selected product
                                   // Navigator.push(
-                                    // context,
-                                    // MaterialPageRoute(
-                                    //   builder: (context) => DrugEntryForm(product: product),
-                                    // ),
+                                  // context,
+                                  // MaterialPageRoute(
+                                  //   builder: (context) => DrugEntryForm(product: product),
+                                  // ),
                                   // );
                                 },
                               ),
                               IconButton(
                                 icon: Icon(Icons.delete, color: Colors.red),
                                 onPressed: () async {
-                                  bool success = await deleteProduct(product.pk.toString());
-                                    if (success) {
-                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                        content: Text('Product successfully deleted'),
-                                      ));
-                                      // Optionally refresh the list or navigate away
-                                    } else {
-                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                        content: Text('Failed to delete product'),
-                                      ));
-                                    }
+                                  bool success = await deleteProduct(
+                                      product.pk.toString());
+                                  if (success) {
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(SnackBar(
+                                      content:
+                                          Text('Product successfully deleted'),
+                                    ));
+                                    // Optionally refresh the list or navigate away
+                                  } else {
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(SnackBar(
+                                      content: Text('Failed to delete product'),
+                                    ));
+                                  }
                                 },
                                 // child: Text('Delete Product'),
                               ),
@@ -169,7 +175,9 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddDrugForm()), // Navigate to the add drug form
+            MaterialPageRoute(
+                builder: (context) =>
+                    AddDrugForm()), // Navigate to the add drug form
           );
         },
         child: const Icon(Icons.add),

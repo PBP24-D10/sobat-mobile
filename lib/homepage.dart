@@ -7,6 +7,9 @@ import 'package:sobat_mobile/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:sobat_mobile/authentication/login.dart';
+import 'package:sobat_mobile/widgets/shop_container.dart';
+import 'package:sobat_mobile/widgets/tagline.dart';
+import 'package:sobat_mobile/widgets/widget_custom.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -128,11 +131,46 @@ class _MyHomePageState extends State<MyHomePage> {
             //     }
             //   }
             // },
-            // )
+            // ),
           ],
         ),
       ),
       drawer: LeftDrawer(),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(14.0),
+          child: Column(
+            children: [
+              SizedBox(
+                height: 100,
+                child: ListView(
+                  shrinkWrap: true,
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    cart(),
+                    cart(),
+                    cart(),
+                    cart(),
+                    cart(),
+                    cart(),
+                    cart(),
+                    cart(),
+                    cart(),
+                  ],
+                ),
+              ),
+              tagline(),
+              SizedBox(
+                height: 20,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [WidgetCustom(), WidgetCustom()],
+              )
+            ],
+          ),
+        ),
+      ),
       // body:
       // SingleChildScrollView(child:
       // Center(
