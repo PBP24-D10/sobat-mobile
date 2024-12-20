@@ -13,7 +13,7 @@ class ReviewTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final request = context.read<CookieRequest>();
-
+    String nama = request.jsonData['username'];
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -44,84 +44,85 @@ class ReviewTile extends StatelessWidget {
               style: const TextStyle(color: Color.fromARGB(255, 127, 127, 127)),
             ),
             const SizedBox(height: 16),
-            Row(
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EditReviewPage(
-                          reviewID: item.id,
-                          productID: item.product,
-                          initialRating: item.rating,
-                          initialComment: item.comment,
+            if (nama == item.username)
+              Row(
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditReviewPage(
+                            reviewID: item.id,
+                            productID: item.product,
+                            initialRating: item.rating,
+                            initialComment: item.comment,
+                          ),
                         ),
-                      ),
-                    ).then((value) {
-                      if (context.mounted) {
-                        if (value == true) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Review successfully updated!"),
-                            ),
-                          );
+                      ).then((value) {
+                        if (context.mounted) {
+                          if (value == true) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Review successfully updated!"),
+                              ),
+                            );
+                            onDelete();
+                          }
                         }
-                      }
-                    });
-                  },
-                  child: const Text("Edit"),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                  onPressed: () async {
-                    // Show confirmation dialog
-                    bool? confirmDelete = await showDialog<bool>(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text("Confirm Delete"),
-                        content: const Text("Are you sure you want to delete this review?"),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, false),
-                            child: const Text("Cancel"),
-                          ),
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, true),
-                            child: const Text("Delete"),
-                          ),
-                        ],
-                      ),
-                    );
-
-                    if (confirmDelete == true) {
-                      final response = await request.postJson(
-                        "http://localhost:8000/review/${item.product}/${item.id}/delete-flutter/",
-                        {},
+                      });
+                    },
+                    child: const Text("Edit"),
+                  ),
+                  const SizedBox(width: 10),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                    onPressed: () async {
+                      // Show confirmation dialog
+                      bool? confirmDelete = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text("Confirm Delete"),
+                          content: const Text("Are you sure you want to delete this review?"),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text("Cancel"),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: const Text("Delete"),
+                            ),
+                          ],
+                        ),
                       );
-                      if (context.mounted) {
-                        if (response['status'] == 'success') {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Review successfully deleted!"),
-                            ),
-                          );
-                          onDelete();
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Failed to delete review. Please try again."),
-                            ),
-                          );
+                      if (confirmDelete == true) {
+                        final response = await request.post(
+                          "http://127.0.0.1:8000/review/${item.product}/${item.id}/delete-flutter/",
+                          {},
+                        );
+                        if (context.mounted) {
+                          if (response['status'] == 'success') {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Review successfully deleted!"),
+                              ),
+                            );
+                            onDelete();
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Failed to delete review. Please try again."),
+                              ),
+                            );
+                          }
                         }
                       }
-                    }
-                  },
-                  child: const Text("Delete"),
-                ),
-              ],
-            ),
+                    },
+                    child: const Text("Delete"),
+                  ),
+                ],
+              ),
           ],
         ),
       ),

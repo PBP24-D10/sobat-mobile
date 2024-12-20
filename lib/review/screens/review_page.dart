@@ -51,8 +51,8 @@ class _ReviewPageState extends State<ReviewPage> {
 
   @override
   Widget build(BuildContext context) {
-    final request = context.watch<CookieRequest>();
-    // String role = request.jsonData['role'];
+    final request = context.read<CookieRequest>();
+    String role = request.jsonData['role'];
     return Scaffold(
       appBar: AppBar(
         title: const Text('Reviews'),
@@ -105,7 +105,7 @@ class _ReviewPageState extends State<ReviewPage> {
                         child: const Text('Back'),
                       ),
                       const SizedBox(width: 10),
-                      // if (role == 'pengguna')
+                      if (role == 'pengguna')
                         ElevatedButton(
                           onPressed: () {
                             Navigator.push(
@@ -178,7 +178,7 @@ class _ReviewPageState extends State<ReviewPage> {
                         child: const Text('Back'),
                       ),
                       const SizedBox(width: 10),
-                      // if (role == 'pengguna')
+                      if (role == 'pengguna')
                         ElevatedButton(
                           onPressed: () {
                             Navigator.push(

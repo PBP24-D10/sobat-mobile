@@ -94,7 +94,7 @@ class _ReviewFormPageState extends State<ReviewFormPage> {
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         final response = await request.postJson(
-                          "http://localhost:8000/review/${widget.productID}/create-flutter/",
+                          "http://127.0.0.1:8000/review/${widget.productID}/create-flutter/",
                           jsonEncode(<String, dynamic>{
                             'rating': _rating,
                             'comment': _comment,
