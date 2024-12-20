@@ -1,32 +1,26 @@
 import 'dart:convert';
-import 'package:cookie_jar/cookie_jar.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pbp_django_auth/pbp_django_auth.dart';
-import 'package:provider/provider.dart';
 import 'package:sobat_mobile/daftar_favorite/models/models.dart';
 import 'package:sobat_mobile/daftar_favorite/widgets/list_product.dart';
-import 'package:sobat_mobile/drug/models/drug_entry.dart';
-import 'package:sobat_mobile/drug/screens/drug_detail.dart';
 
-class ProductListScreen extends StatefulWidget {
-  const ProductListScreen({Key? key}) : super(key: key);
+class copyDaftar extends StatefulWidget {
+  const copyDaftar({Key? key}) : super(key: key);
 
   @override
-  _ProductListScreenState createState() => _ProductListScreenState();
+  _copyDaftarState createState() => _copyDaftarState();
 }
 
-class _ProductListScreenState extends State<ProductListScreen> {
+class _copyDaftarState extends State<copyDaftar> {
   final String baseUrl = 'http://localhost:8000/media/';
-  // int totalFavorit = 0;
-
+  int totalFavorit = 0;
   Map<String, dynamic> productDetailsMap = {};
   Map<String, String> productPKMap = {};
   late Future<void> fetchFuture;
   @override
   void initState() {
     super.initState();
-
     fetchFuture = fetchMood(CookieRequest()); // Memuat data awal
   }
 
@@ -39,9 +33,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
     List<FavoriteEntry> listMood = [];
     for (var d in data) {
       if (d != null) {
+        totalFavorit++;
         listMood.add(FavoriteEntry.fromJson(d));
         String b = d["fields"]["product"];
-
         String pk = d['pk'];
         productPKMap[b] = pk;
 
@@ -60,88 +54,36 @@ class _ProductListScreenState extends State<ProductListScreen> {
     return listMood;
   }
 
-  Future<DrugModel> fetchDrugDetails(String productId) async {
-    print("Fetching product with ID: $productId");
-
-    final response = await http.get(
-      Uri.parse('http://127.0.0.1:8000/product/json/$productId/'),
-    );
-
-    if (response.statusCode == 200) {
-      // Pastikan respons adalah Map<String, dynamic>
-      final List<dynamic> jsonList = jsonDecode(response.body);
-      if (jsonList.isNotEmpty) {
-        // Ambil elemen pertama dari list
-        final Map<String, dynamic> jsonMap = jsonList[0];
-        return DrugModel.fromJson(jsonMap);
-      } else {
-        throw Exception("Data produk tidak ditemukan");
-      }
-    } else {
-      throw Exception("Gagal memuat produk: ${response.statusCode}");
-    }
-  }
-
-  void navigateToProductDetail(
-      BuildContext context, String productId, String productPk) async {
-    try {
-      DrugModel product = await fetchDrugDetails(productId);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ProductDetailPage(
-            product: product.fields,
-            detailRoute: () => deleteProduct(productPk),
-          ),
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Gagal memuat detail produk: $e")),
-      );
-    }
-  }
-
-  // Future<String?> fetchCsrfToken() async {
-  //   try {
-  //     final response = await http
-  //         .get(Uri.parse('http://127.0.0.1:8000/favorite/get-csrf-token/'));
-  //     print('Response Status Code: ${response.statusCode}');
-  //     print('Response Body: ${response.body}');
-  //     if (response.statusCode == 200) {
-  //       final jsonResponse = jsonDecode(response.body);
-  //       return jsonResponse['csrf_token'];
-  //     }
-  //   } catch (error) {
-  //     print('Error fetching CSRF token: $error');
-  //   }
-  //   return null;
-  // }
-
   Future<void> deleteProduct(String productId) async {
     try {
       final response = await http.delete(
-        Uri.parse('http://127.0.0.1:8000/favorite/api/$productId/'),
-        headers: {
-          'Content-Type': 'application/json',
-          // Sertakan CSRF token
-        },
+        Uri.parse('http://127.0.0.1:8000/favorite/delete/$productId/'),
+        // headers: {
+        //   'Content-Type': 'application/json',
+        // },
       );
 
       if (response.statusCode == 200) {
-        print('Produk berhasil dihapus');
-        await fetchMood(CookieRequest());
+        setState(() {
+          productDetailsMap.remove(productId.toString());
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Produk berhasil dihapus!')),
+        );
       } else {
-        print('Gagal menghapus produk. Status: ${response.statusCode}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal menghapus produk.')),
+        );
       }
     } catch (error) {
-      print('Error: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Terjadi kesalahan: $error')),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final request = context.watch<CookieRequest>();
     return Scaffold(
       appBar: AppBar(
         title: const Text("Daftar Produk Favorit"),
@@ -171,9 +113,18 @@ class _ProductListScreenState extends State<ProductListScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
               child: Column(
                 children: [
-                  ListView.builder(
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [Text("Item : $totalFavorit")],
+                  ),
+                  GridView.builder(
                     physics: NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.75,
+                    ),
                     itemCount: products.length,
                     itemBuilder: (context, index) {
                       final product = products[index];
@@ -185,7 +136,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
                           productDetailsMap[productId]["drug_form"];
                       String drugCategory =
                           productDetailsMap[productId]["category"];
-
                       // print("ini pk" + productPk);
                       // print(productPKMap);
                       // print(productDetailsMap);
@@ -197,15 +147,22 @@ class _ProductListScreenState extends State<ProductListScreen> {
                       //     ? productDetails['fields']['name']
                       //     : 'Loading...';
 
-                      return productTile(
-                        name: productDetailsMap[productId]["name"],
-                        price: productDetailsMap[productId]["price"],
-                        imageUrl: imageUrl,
-                        onPressed: () => deleteProduct(productPk),
-                        drugForm: drugForm,
-                        category: drugCategory,
-                        detailRoute: () => navigateToProductDetail(
-                            context, productId, productPk),
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // productTile(
+                          //     name: productDetailsMap[productId]["name"],
+                          //     price: productDetailsMap[productId]["price"]),
+                          productTile(
+                            name: productDetailsMap[productId]["name"],
+                            price: productDetailsMap[productId]["price"],
+                            imageUrl: imageUrl,
+                            onPressed: () => deleteProduct(productPk),
+                            drugForm: drugForm,
+                            category: drugCategory,
+                            detailRoute: () {},
+                          ),
+                        ],
                       );
                     },
                   ),
