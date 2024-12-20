@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:sobat_mobile/drug/models/drug_entry.dart';
 import 'package:sobat_mobile/forum/models/answer_entry.dart';
@@ -20,7 +22,8 @@ class _AnswersPageState extends State<AnswersPage> {
   Future<List<Answer>> fetchAnswers(CookieRequest request) async {
     String questionId = widget.question.pk;
 
-    final response = await request.get('http://127.0.0.1:8000/forum/show_json_answer/$questionId/');
+    final response = await request
+        .get('http://127.0.0.1:8000/forum/show_json_answer/$questionId/');
 
     // Melakukan decode response menjadi bentuk json
     var data = response;
@@ -38,6 +41,7 @@ class _AnswersPageState extends State<AnswersPage> {
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
+    int id = request.jsonData['id'];
     return Scaffold(
       appBar: AppBar(
         title: const Text('Forum Q&A'),
@@ -73,7 +77,7 @@ class _AnswersPageState extends State<AnswersPage> {
                 ),
               ],
             ),
-          ),   
+          ),
           // FutureBuilder for answers
           Expanded(
             child: FutureBuilder(
@@ -82,26 +86,30 @@ class _AnswersPageState extends State<AnswersPage> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (!snapshot.hasData || snapshot.data.isEmpty) {
-                  return const Center(
+                  // return Center(
+                  //   child: ElevatedButton(
+                  //     onPressed: () async {
+                  //       final response = await request.postJson(
+                  //           "http://127.0.0.1:8000/review/9366302cbaf74bc09f190542e868403b/create-flutter/",
+                  //           jsonEncode(<String, dynamic>{
+                  //             'rating': 2,
+                  //             'comment': "jelek",
+                  //           }),
+                  //       );
+                  //     },
+                  //     child: const Text("buat"),
+                  //   ),
+                  // );
+                  return Center(
                     child: Text(
-                      'Belum ada jawaban pada pertanyaan ini.',
-                      style: TextStyle(fontSize: 20, color: Color(0xff59A5D8)),
+                      'role: $id',
+                      style: const TextStyle(fontSize: 20, color: Color(0xff59A5D8)),
                     ),
                   );
                 } else {
                   return ListView.builder(
                     itemCount: snapshot.data!.length,
                     itemBuilder: (_, index) => GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AnswersPage(
-                              question: snapshot.data![index],
-                            ),
-                          ),
-                        );
-                      },
                       child: Container(
                         margin: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 12),
@@ -122,9 +130,12 @@ class _AnswersPageState extends State<AnswersPage> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            Text("${snapshot.data![index].fields.user}"),
+                            const SizedBox(height: 10),
                             Text("${snapshot.data![index].fields.answer}"),
                             const SizedBox(height: 10),
-                            Text("Likes: ${snapshot.data![index].fields.numLikes}"),
+                            Text(
+                                "Likes: ${snapshot.data![index].fields.numLikes}"),
                           ],
                         ),
                       ),

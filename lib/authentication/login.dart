@@ -108,20 +108,16 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 24.0),
                   ElevatedButton(
                     onPressed: () async {
-                      String nama = _namaController.text;
                       String username = _usernameController.text;
                       String password = _passwordController.text;
-                      String role = _roleController.text;
 
                       // Cek kredensial
                       // Untuk menyambungkan Android emulator dengan Django pada localhost,
                       // gunakan URL http://10.0.2.2/
                       final response = await request
                           .login("http://127.0.0.1:8000/login_mobile/", {
-                        'nama': nama,
                         'username': username,
                         'password': password,
-                        'role': role,
                       });
 
                       if (request.loggedIn) {
