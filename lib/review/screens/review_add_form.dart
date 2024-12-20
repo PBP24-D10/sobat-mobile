@@ -107,7 +107,7 @@ class _ReviewFormPageState extends State<ReviewFormPage> {
                                 content: Text("Review successfully saved!"),
                               ),
                             );
-                            Navigator.pop(context);
+                            Navigator.pop(context, true);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
