@@ -125,7 +125,7 @@ class _EditReviewPageState extends State<EditReviewPage> {
                                 content: Text("Review has been updated!"),
                               ),
                             );
-                            Navigator.pop(context);
+                            Navigator.pop(context, true);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(

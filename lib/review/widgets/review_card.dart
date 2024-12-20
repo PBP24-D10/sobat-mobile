@@ -6,9 +6,9 @@ import 'package:provider/provider.dart';
 
 class ReviewTile extends StatelessWidget {
   final Review item;
-  final Function onDelete;
+  final Function onChanged;
 
-  const ReviewTile(this.item, {super.key, required this.onDelete});
+  const ReviewTile(this.item, {super.key, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -62,12 +62,12 @@ class ReviewTile extends StatelessWidget {
                       ).then((value) {
                         if (context.mounted) {
                           if (value == true) {
+                            onChanged();
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text("Review successfully updated!"),
                               ),
                             );
-                            onDelete();
                           }
                         }
                       });
@@ -108,7 +108,7 @@ class ReviewTile extends StatelessWidget {
                                 content: Text("Review successfully deleted!"),
                               ),
                             );
-                            onDelete();
+                            onChanged();
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(

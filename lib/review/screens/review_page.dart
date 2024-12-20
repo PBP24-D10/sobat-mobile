@@ -114,7 +114,9 @@ class _ReviewPageState extends State<ReviewPage> {
                                 builder: (context) => ReviewFormPage(productID: widget.productID),
                               ),
                             ).then((value) {
-                              if (value == true) refreshReviews();
+                              if (value == true) {
+                                refreshReviews();
+                              }
                             });
                           },
                           child: const Text('Add Review'),
@@ -187,7 +189,9 @@ class _ReviewPageState extends State<ReviewPage> {
                                 builder: (context) => ReviewFormPage(productID: widget.productID),
                               ),
                             ).then((value) {
-                              if (value == true) refreshReviews();
+                              if (value == true) {
+                                refreshReviews();
+                              }
                             });
                           },
                           child: const Text('Add Review'),
@@ -210,7 +214,7 @@ class _ReviewPageState extends State<ReviewPage> {
                     children: reviews.map((review) {
                       return ReviewTile(
                         review,
-                        onDelete: refreshReviews,
+                        onChanged: refreshReviews,
                       );
                     }).toList(),
                   ),
