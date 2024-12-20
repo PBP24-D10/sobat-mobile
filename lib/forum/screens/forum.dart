@@ -15,7 +15,7 @@ class ForumPage extends StatefulWidget {
 }
 
 class _ForumPageState extends State<ForumPage> {
-  Future<List<Question>> fetchProduct(CookieRequest request) async {
+  Future<List<Question>> fetchQuestions(CookieRequest request) async {
     final response = await request.get('http://127.0.0.1:8000/forum/json/');
     
     // Melakukan decode response menjadi bentuk json
@@ -43,7 +43,7 @@ class _ForumPageState extends State<ForumPage> {
         ),
       ),
       body: FutureBuilder(
-        future: fetchProduct(request),
+        future: fetchQuestions(request),
         builder: (context, AsyncSnapshot snapshot) {
           if (snapshot.data == null) {
             return const Center(child: CircularProgressIndicator());
@@ -101,9 +101,31 @@ class _ForumPageState extends State<ForumPage> {
                         const SizedBox(height: 10),
                         Text("${snapshot.data![index].fields.question}"),
                         const SizedBox(height: 10),
-                        Text("Likes: ${snapshot.data![index].fields.numLikes}"),
-                        const SizedBox(height: 10),
-                        Text("Answers: ${snapshot.data![index].fields.numAnswer}"),
+                        Row(
+                          children: [
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                // Add logic to handle like functionality
+                              },
+                              icon: const Icon(Icons.thumb_up, size: 16),
+                              label: Text("${snapshot.data![index].fields.numLikes}"),
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                // Add logic to handle answers functionality
+                              },
+                              icon: const Icon(Icons.comment, size: 16),
+                              label: Text("${snapshot.data![index].fields.numAnswer}"),
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
