@@ -1,9 +1,10 @@
+// lib/shop/widgets/shop_card.dart
 import 'package:flutter/material.dart';
-import 'package:sobat_mobile/shop/models/shop_model.dart';
+import 'package:sobat_mobile/shop/models/shop_model.dart' as model;
 import 'package:sobat_mobile/shop/screens/shop_detail_page.dart';
 
 class ShopCard extends StatelessWidget {
-  final ShopEntry shop;
+  final model.ShopEntry shop;
 
   const ShopCard({
     super.key,
@@ -23,36 +24,33 @@ class ShopCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Shop Profile Image or Placeholder
             Container(
               height: 180,
               width: double.infinity,
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                 image: shop.fields.profileImage.isNotEmpty
-                  ? DecorationImage(
-                      image: NetworkImage(shop.fields.profileImage),
-                      fit: BoxFit.cover,
-                    )
-                  : null,
+                    ? DecorationImage(
+                        image: NetworkImage(shop.fields.profileImage),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
               ),
               child: shop.fields.profileImage.isEmpty
-                ? Center(
-                    child: Icon(
-                      Icons.storefront,
-                      size: 80,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  )
-                : null,
+                  ? Center(
+                      child: Icon(
+                        Icons.storefront,
+                        size: 80,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    )
+                  : null,
             ),
-
             Padding(
               padding: const EdgeInsets.all(15),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Shop Name
                   Text(
                     shop.fields.name,
                     style: const TextStyle(
@@ -63,8 +61,6 @@ class ShopCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 10),
-
-                  // Address and Operating Hours
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -108,8 +104,6 @@ class ShopCard extends StatelessWidget {
                 ],
               ),
             ),
-
-            // Detail Button
             Padding(
               padding: const EdgeInsets.all(15),
               child: Align(
@@ -133,7 +127,7 @@ class ShopCard extends StatelessWidget {
                     'Shop Details',
                     style: TextStyle(
                       color: Colors.white,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),

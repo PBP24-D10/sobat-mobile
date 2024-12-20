@@ -1,10 +1,14 @@
+// lib/shop/screens/shop_main_page.dart
+
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:sobat_mobile/shop/models/shop_model.dart';
+import 'package:sobat_mobile/shop/models/shop_model.dart';  // Pastikan menggunakan ShopEntry dari shop_model.dart
 import 'package:sobat_mobile/shop/widgets/shop_card.dart';
 import 'package:sobat_mobile/shop/screens/shop_form.dart';
 import 'package:sobat_mobile/widgets/left_drawer.dart';
+import 'package:http/http.dart' as http;
 
 class ShopMainPage extends StatefulWidget {
   const ShopMainPage({super.key});
@@ -14,29 +18,42 @@ class ShopMainPage extends StatefulWidget {
 }
 
 class _ShopMainPageState extends State<ShopMainPage> {
-  String userRole = ''; // to store user role from backend
+  String userRole = '';
 
   Future<List<ShopEntry>> fetchShops(CookieRequest request) async {
     try {
-      final response = await request.get('http://127.0.0.1:8000/shop/json/');
-      if (response is List) {
-        return response.map((data) => ShopEntry.fromJson(data)).toList();
+      print("Attempting to fetch shops...");
+      
+      final response = await http.get(
+        Uri.parse('http://localhost:8000/shop/show-json/'),  // Gunakan localhost untuk web
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final List<dynamic> decoded = json.decode(response.body);
+        return decoded.map((data) => ShopEntry.fromJson(data)).toList();
       } else {
-        throw Exception("Invalid response format");
+        throw Exception('Failed to load shops: ${response.statusCode}');
       }
-    } catch (e) {
-      debugPrint("Error fetching shops: $e");
-      return [];
+    } catch (e, stackTrace) {
+      print("Error fetching shops: $e");
+      print("Stack trace: $stackTrace");
+      rethrow;
     }
   }
 
   Future<void> fetchUserRole(CookieRequest request) async {
     try {
-      // Assuming backend provides user role in this endpoint
-      final response = await request.get('http://127.0.0.1:8000/user/role/');
+      final response = await request.get('http://10.0.2.2:8000/user/role/');
       if (response.containsKey('role')) {
         setState(() {
-          userRole = response['role']; // set user role
+          userRole = response['role'];
         });
       } else {
         throw Exception("Role information not available");
@@ -44,7 +61,7 @@ class _ShopMainPageState extends State<ShopMainPage> {
     } catch (e) {
       debugPrint("Error fetching user role: $e");
       setState(() {
-        userRole = ''; // fallback if role cannot be fetched
+        userRole = '';
       });
     }
   }
@@ -53,7 +70,7 @@ class _ShopMainPageState extends State<ShopMainPage> {
   void initState() {
     super.initState();
     final request = context.read<CookieRequest>();
-    fetchUserRole(request); // fetch user role on init
+    fetchUserRole(request);
   }
 
   @override
@@ -106,13 +123,12 @@ class _ShopMainPageState extends State<ShopMainPage> {
               itemCount: snapshot.data!.length,
               itemBuilder: (_, index) {
                 final shop = snapshot.data![index];
-                return ShopCard(shop: shop);
+                return ShopCard(shop: shop); // Gunakan ShopEntry dari shop_model.dart
               },
             );
           }
         },
       ),
-      // Floating Action Button to Add New Shop
       floatingActionButton: userRole == 'apoteker'
           ? FloatingActionButton(
               onPressed: () {
@@ -124,7 +140,7 @@ class _ShopMainPageState extends State<ShopMainPage> {
               backgroundColor: Theme.of(context).colorScheme.primary,
               child: const Icon(Icons.add, color: Colors.white),
             )
-          : null, // If user is not an apoteker, do not show the button
+          : null,
     );
   }
 }

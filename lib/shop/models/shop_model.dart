@@ -1,3 +1,5 @@
+// lib/shop/models/shop_model.dart
+
 class ShopEntry {
   String model;
   String pk;
@@ -14,6 +16,8 @@ class ShopEntry {
         pk: json["pk"].toString(),
         fields: Fields.fromJson(json["fields"]),
       );
+
+  Object? get name => null;
 
   Map<String, dynamic> toJson() => {
         "model": model,
