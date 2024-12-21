@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:sobat_mobile/drug/models/drug_entry.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -23,6 +25,7 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
       if (d != null) {
         try {
           final entry = DrugModel.fromJson(d);
+
           listProduct.add(entry);
         } catch (e) {
           // Handle any error during data parsing
@@ -32,6 +35,45 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
     return listProduct;
   }
 
+  Future<String?> fetchCsrfToken() async {
+    try {
+      final response = await http
+          .get(Uri.parse('http://127.0.0.1:8000/favorite/get-csrf-token/'));
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        return jsonResponse['csrf_token'];
+      }
+    } catch (error) {
+      print('Error fetching CSRF token: $error');
+    }
+    return null;
+  }
+
+  Future<void> addToFavorite(String productId, CookieRequest request) async {
+    try {
+      // Kirim permintaan POST ke endpoint favorit
+      final response = await request
+          .post('http://127.0.0.1:8000/favorite/api/add/$productId/', {});
+      // headers: {
+      //   'Content-Type': 'application/json',
+      //   // 'X-CSRFToken': csrfToken, // Menambahkan CSRF token
+      // },
+
+      // if (response.statusCode == 200) {
+      //   // Jika berhasil, ubah UI sesuai dengan respons
+      //   print('Produk berhasil ditambahkan ke favorit!');
+      //   // Menampilkan pesan atau memperbarui UI sesuai respons
+      // } else {
+      //   print(
+      //       'Gagal menambahkan produk ke favorit. Status: ${response.statusCode}');
+      //   // Tampilkan pesan error
+      // }
+    } catch (error) {
+      print('Terjadi kesalahan: $error');
+    }
+  }
   // Future<bool> deleteProduct(CookieRequest request, String productId) async {
   //   final response = await request.delete('http://localhost:8000/product/delete/$productId/');
   //   if (response.statusCode == 200) {
@@ -79,15 +121,18 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
                 itemCount: snapshot.data!.length,
                 itemBuilder: (_, index) {
                   final product = snapshot.data![index];
-                  // print("test" + product.body);
+
                   return InkWell(
                     onTap: () {
                       // Navigasi ke halaman detail produk
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              ProductDetailPage(product: product),
+                          builder: (context) => ProductDetailPage(
+                            product: product.fields,
+                            detailRoute: () =>
+                                addToFavorite(product.pk, request),
+                          ),
                         ),
                       );
                     },

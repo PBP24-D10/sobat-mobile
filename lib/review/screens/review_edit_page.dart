@@ -112,7 +112,7 @@ class _EditReviewPageState extends State<EditReviewPage> {
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         final response = await request.postJson(
-                          "http://localhost:8000/review/${widget.productID}/${widget.reviewID}/edit-flutter/",
+                          "http://127.0.0.1:8000/review/${widget.productID}/${widget.reviewID}/edit-flutter/",
                           jsonEncode(<String, dynamic>{
                             'rating': _rating,
                             'comment': _comment,
@@ -125,7 +125,7 @@ class _EditReviewPageState extends State<EditReviewPage> {
                                 content: Text("Review has been updated!"),
                               ),
                             );
-                            Navigator.pop(context);
+                            Navigator.pop(context, true);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
