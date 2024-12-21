@@ -35,28 +35,41 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
     return listProduct;
   }
 
-  Future<void> addToFavorite(String productId) async {
+  Future<String?> fetchCsrfToken() async {
     try {
-      // Ambil CSRF token
-
-      // Kirim permintaan POST ke endpoint favorit
-      final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/favorite/api/add/$productId/'),
-        headers: {
-          'Content-Type': 'application/json',
-          // Menambahkan CSRF token
-        },
-      );
-
+      final response = await http
+          .get(Uri.parse('http://127.0.0.1:8000/favorite/get-csrf-token/'));
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
       if (response.statusCode == 200) {
-        // Jika berhasil, ubah UI sesuai dengan respons
-        print('Produk berhasil ditambahkan ke favorit!');
-        // Menampilkan pesan atau memperbarui UI sesuai respons
-      } else {
-        print(
-            'Gagal menambahkan produk ke favorit. Status: ${response.statusCode}');
-        // Tampilkan pesan error
+        final jsonResponse = jsonDecode(response.body);
+        return jsonResponse['csrf_token'];
       }
+    } catch (error) {
+      print('Error fetching CSRF token: $error');
+    }
+    return null;
+  }
+
+  Future<void> addToFavorite(String productId, CookieRequest request) async {
+    try {
+      // Kirim permintaan POST ke endpoint favorit
+      final response = await request
+          .post('http://127.0.0.1:8000/favorite/api/add/$productId/', {});
+      // headers: {
+      //   'Content-Type': 'application/json',
+      //   // 'X-CSRFToken': csrfToken, // Menambahkan CSRF token
+      // },
+
+      // if (response.statusCode == 200) {
+      //   // Jika berhasil, ubah UI sesuai dengan respons
+      //   print('Produk berhasil ditambahkan ke favorit!');
+      //   // Menampilkan pesan atau memperbarui UI sesuai respons
+      // } else {
+      //   print(
+      //       'Gagal menambahkan produk ke favorit. Status: ${response.statusCode}');
+      //   // Tampilkan pesan error
+      // }
     } catch (error) {
       print('Terjadi kesalahan: $error');
     }
@@ -117,7 +130,8 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
                         MaterialPageRoute(
                           builder: (context) => ProductDetailPage(
                             product: product.fields,
-                            detailRoute: () => addToFavorite(product.pk),
+                            detailRoute: () =>
+                                addToFavorite(product.pk, request),
                           ),
                         ),
                       );

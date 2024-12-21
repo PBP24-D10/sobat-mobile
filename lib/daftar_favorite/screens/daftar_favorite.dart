@@ -17,6 +17,7 @@ class ProductListScreen extends StatefulWidget {
 }
 
 class _ProductListScreenState extends State<ProductListScreen> {
+  List<FavoriteEntry> favoriteProducts = [];
   final String baseUrl = 'http://localhost:8000/media/';
   // int totalFavorit = 0;
 
@@ -102,22 +103,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
     }
   }
 
-  // Future<String?> fetchCsrfToken() async {
-  //   try {
-  //     final response = await http
-  //         .get(Uri.parse('http://127.0.0.1:8000/favorite/get-csrf-token/'));
-  //     print('Response Status Code: ${response.statusCode}');
-  //     print('Response Body: ${response.body}');
-  //     if (response.statusCode == 200) {
-  //       final jsonResponse = jsonDecode(response.body);
-  //       return jsonResponse['csrf_token'];
-  //     }
-  //   } catch (error) {
-  //     print('Error fetching CSRF token: $error');
-  //   }
-  //   return null;
-  // }
-
   Future<void> deleteProduct(String productId) async {
     try {
       final response = await http.delete(
@@ -130,7 +115,11 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
       if (response.statusCode == 200) {
         print('Produk berhasil dihapus');
-        await fetchMood(CookieRequest());
+        List<FavoriteEntry> updatedFavorites = await fetchMood(CookieRequest());
+        setState(() {
+          favoriteProducts = updatedFavorites; // Perbarui state
+        });
+        // await fetchMood(CookieRequest());
       } else {
         print('Gagal menghapus produk. Status: ${response.statusCode}');
       }
@@ -186,9 +175,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                       String drugCategory =
                           productDetailsMap[productId]["category"];
 
-                      // print("ini pk" + productPk);
-                      // print(productPKMap);
-                      // print(productDetailsMap);
+                      ;
 
                       // Get the product details from the map (this should be updated once product data is loaded)
                       // Map<String, dynamic>? productDetails =
