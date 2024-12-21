@@ -41,7 +41,6 @@ class _AnswersPageState extends State<AnswersPage> {
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
-    int id = request.jsonData['id'];
     return Scaffold(
       appBar: AppBar(
         title: const Text('Forum Q&A'),
@@ -86,24 +85,18 @@ class _AnswersPageState extends State<AnswersPage> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (!snapshot.hasData || snapshot.data.isEmpty) {
-                  // return Center(
-                  //   child: ElevatedButton(
-                  //     onPressed: () async {
-                  //       final response = await request.postJson(
-                  //           "http://127.0.0.1:8000/review/9366302cbaf74bc09f190542e868403b/create-flutter/",
-                  //           jsonEncode(<String, dynamic>{
-                  //             'rating': 2,
-                  //             'comment': "jelek",
-                  //           }),
-                  //       );
-                  //     },
-                  //     child: const Text("buat"),
-                  //   ),
-                  // );
                   return Center(
-                    child: Text(
-                      'role: $id',
-                      style: const TextStyle(fontSize: 20, color: Color(0xff59A5D8)),
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        final response = await request.postJson(
+                            "http://127.0.0.1:8000/review/9366302cbaf74bc09f190542e868403b/create-flutter/",
+                            jsonEncode(<String, dynamic>{
+                              'rating': 2,
+                              'comment': "jelek",
+                            }),
+                        );
+                      },
+                      child: const Text("buat"),
                     ),
                   );
                 } else {
