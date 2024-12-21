@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:sobat_mobile/shop/models/shop_model.dart';  // Pastikan menggunakan ShopEntry dari shop_model.dart
+import 'package:sobat_mobile/shop/models/shop_model.dart';
 import 'package:sobat_mobile/shop/widgets/shop_card.dart';
 import 'package:sobat_mobile/shop/screens/shop_form.dart';
 import 'package:sobat_mobile/widgets/left_drawer.dart';
@@ -22,18 +22,14 @@ class _ShopMainPageState extends State<ShopMainPage> {
 
   Future<List<ShopEntry>> fetchShops(CookieRequest request) async {
     try {
-      print("Attempting to fetch shops...");
-      
+      // Gunakan localhost untuk web
       final response = await http.get(
-        Uri.parse('http://localhost:8000/shop/show-json/'),  // Gunakan localhost untuk web
+        Uri.parse('http://localhost:8000/shop/show-json/'),
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
       );
-
-      print("Response status: ${response.statusCode}");
-      print("Response body: ${response.body}");
 
       if (response.statusCode == 200) {
         final List<dynamic> decoded = json.decode(response.body);
@@ -41,25 +37,25 @@ class _ShopMainPageState extends State<ShopMainPage> {
       } else {
         throw Exception('Failed to load shops: ${response.statusCode}');
       }
-    } catch (e, stackTrace) {
+    } catch (e) {
       print("Error fetching shops: $e");
-      print("Stack trace: $stackTrace");
       rethrow;
     }
   }
 
   Future<void> fetchUserRole(CookieRequest request) async {
     try {
-      final response = await request.get('http://10.0.2.2:8000/user/role/');
-      if (response.containsKey('role')) {
+      // Gunakan localhost untuk web
+      final response = await request.get('http://localhost:8000/auth/get_user_role/');
+      print("Role response: $response"); // Debug print
+      if (response != null && response['role'] != null) {
         setState(() {
           userRole = response['role'];
         });
-      } else {
-        throw Exception("Role information not available");
+        print("User role set to: $userRole"); // Debug print
       }
     } catch (e) {
-      debugPrint("Error fetching user role: $e");
+      print("Error fetching user role: $e"); // Debug print
       setState(() {
         userRole = '';
       });
@@ -99,7 +95,7 @@ class _ShopMainPageState extends State<ShopMainPage> {
           } else if (snapshot.hasError) {
             return Center(
               child: Text(
-                "Failed to fetch shops: ${snapshot.error}",
+                "Error: ${snapshot.error}",
                 style: const TextStyle(
                   fontSize: 16,
                   color: Colors.red,
@@ -123,7 +119,7 @@ class _ShopMainPageState extends State<ShopMainPage> {
               itemCount: snapshot.data!.length,
               itemBuilder: (_, index) {
                 final shop = snapshot.data![index];
-                return ShopCard(shop: shop); // Gunakan ShopEntry dari shop_model.dart
+                return ShopCard(shop: shop);
               },
             );
           }
