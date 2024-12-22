@@ -43,7 +43,7 @@ class _EditDrugFormState extends State<EditDrugForm> {
       // print('error');
       // print(widget.productId);
       final response = await http.get(Uri.parse(
-        'https://m-arvin-sobat.pbp.cs.ui.ac.id/json/${widget.productId}/')); // Adjust endpoint
+        'https://m-arvin-sobat.pbp.cs.ui.ac.id/product/json/${widget.productId}/')); // Adjust endpoint
       if (response.statusCode == 200) {
         final List<DrugModel> data = welcomeFromJson(response.body);
         print('Fetched DrugModel Data: ${data[0].toJson()}'); // Debugging
