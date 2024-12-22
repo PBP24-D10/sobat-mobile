@@ -6,6 +6,7 @@ import 'package:sobat_mobile/drug/models/drug_entry.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:sobat_mobile/drug/screens/drug_detail.dart';
+import 'package:sobat_mobile/drug/screens/drugedit_form.dart';
 import 'package:sobat_mobile/drug/screens/drugentry_form.dart'; // Assuming the form is in this file
 import 'package:http/http.dart' as http;
 
@@ -17,8 +18,11 @@ class DrugEntryPage extends StatefulWidget {
 }
 
 class _DrugEntryPageState extends State<DrugEntryPage> {
+  // Define the base URL for images
+  final String baseUrl = 'http://m-arvin-sobat.pbp.cs.ui.ac.id/media/';
+
   Future<List<DrugModel>> fetchProductEntries(CookieRequest request) async {
-    final response = await request.get('http://localhost:8000/product/json/');
+    final response = await request.get('http://m-arvin-sobat.pbp.cs.ui.ac.id/product/json/');
     var data = response;
 
     List<DrugModel> listProduct = [];
@@ -30,6 +34,7 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
           listProduct.add(entry);
         } catch (e) {
           // Handle any error during data parsing
+          print('Error parsing product data: $e');
         }
       }
     }
@@ -46,28 +51,28 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
 
   Future<void> addToFavorite(String productId, CookieRequest request) async {
     try {
-      // Kirim permintaan POST ke endpoint favorit
-      final response = await request
-          .post('http://127.0.0.1:8000/favorite/api/add/$productId/', {});
-      // headers: {
-      //   'Content-Type': 'application/json',
-      //   // 'X-CSRFToken': csrfToken, // Menambahkan CSRF token
-      // },
+      // Send POST request to favorite endpoint
+      final response = await request.post(
+        'http://m-arvin-sobat.pbp.cs.ui.ac.id/favorite/api/add/$productId/',
+        {},
+      );
 
       if (response['status'] == 'success') {
-        // Jika berhasil, tampilkan dialog sukses
+        // If successful, show success dialog
         QuickAlert.show(
-            context: context,
-            type: QuickAlertType.success,
-            title: 'Berhasil!',
-            text: 'Produk berhasil ditambahkan ke favorit.',
-            autoCloseDuration: Duration(seconds: 1),
-            disableBackBtn: true,
-            showConfirmBtn: false);
+          context: context,
+          type: QuickAlertType.success,
+          title: 'Berhasil!',
+          text: 'Produk berhasil ditambahkan ke favorit.',
+          autoCloseDuration: Duration(seconds: 1),
+          disableBackBtn: true,
+          showConfirmBtn: false,
+        );
 
         print('Produk berhasil ditambahkan ke favorit!');
-        // Menampilkan pesan atau memperbarui UI sesuai respons
+        // Optionally, update the UI or state here
       } else {
+        // If the product is already in favorites, show error dialog
         QuickAlert.show(
           context: context,
           type: QuickAlertType.error,
@@ -75,30 +80,18 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
           text: 'Produk sudah ada di favorit.',
           confirmBtnText: 'Kembali',
           onConfirmBtnTap: () {
-            Navigator.pop(context); // Menutup dialog
+            Navigator.pop(context); // Close the dialog
           },
         );
       }
-      // else {
-      //   print(
-      //       'Gagal menambahkan produk ke favorit. Status: ${response.statusCode}');
-      //   // Tampilkan pesan error
-      // }
     } catch (error) {
       print('Terjadi kesalahan: $error');
+      // Optionally, show an error dialog here
     }
   }
-  // Future<bool> deleteProduct(CookieRequest request, String productId) async {
-  //   final response = await request.delete('http://localhost:8000/product/delete/$productId/');
-  //   if (response.statusCode == 200) {
-  //     return true; // Berhasil menghapus
-  //   } else {
-  //     return false; // Gagal menghapus
-  //   }
-  // }
 
   Future<bool> deleteProduct(String productId) async {
-    final url = 'http://localhost:8000/product/delete-drug/$productId/';
+    final url = 'http://m-arvin-sobat.pbp.cs.ui.ac.id/product/delete-drug/$productId/';
     final response = await http.get(Uri.parse(url));
 
     return response.statusCode == 200;
@@ -113,7 +106,7 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
       ),
       body: FutureBuilder(
         future: fetchProductEntries(request),
-        builder: (context, AsyncSnapshot snapshot) {
+        builder: (context, AsyncSnapshot<List<DrugModel>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else {
@@ -135,10 +128,11 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
                 itemCount: snapshot.data!.length,
                 itemBuilder: (_, index) {
                   final product = snapshot.data![index];
+                  final imageUrl = '$baseUrl${product.fields.image}';
 
                   return InkWell(
                     onTap: () {
-                      // Navigasi ke halaman detail produk
+                      // Navigate to product detail page
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -153,7 +147,7 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
                     child: Container(
                       margin: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 12),
-                      padding: const EdgeInsets.all(20.0),
+                      padding: const EdgeInsets.all(16.0),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
@@ -166,58 +160,106 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
                           ),
                         ],
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Row(
                         children: [
-                          Text(
-                            "Nama Produk: ${product.fields.name}",
-                            style: const TextStyle(
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.bold,
+                          // Expanded widget for product details
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  product.fields.name,
+                                  style: const TextStyle(
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  "Harga: \$${product.fields.price}",
+                                  style: const TextStyle(
+                                    fontSize: 16.0,
+                                    color: Colors.black54,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                // Optional: Display description if needed
+                                // Text(
+                                //   "Deskripsi: ${product.fields.desc}",
+                                //   style: const TextStyle(
+                                //     fontSize: 14.0,
+                                //     color: Colors.black54,
+                                //   ),
+                                // ),
+                                const SizedBox(height: 8),
+                                // Row for edit and delete buttons
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    IconButton(
+                                      icon: Icon(Icons.edit,
+                                          color: Colors.blue.shade700),
+                                      onPressed: () {
+                                        // Navigate to edit form, passing the selected product
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                EditDrugForm(
+                                                    productId: product.pk),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.delete,
+                                          color: Colors.red.shade700),
+                                      onPressed: () async {
+                                        bool success = await deleteProduct(
+                                            product.pk.toString());
+                                        if (success) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                            content: Text(
+                                                'Product successfully deleted'),
+                                          ));
+                                          // Optionally refresh the list
+                                          setState(() {});
+                                        } else {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                            content: Text(
+                                                'Failed to delete product'),
+                                          ));
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(height: 10),
-                          Text("Deskripsi: ${product.fields.desc}"),
-                          const SizedBox(height: 10),
-                          Text("Harga: \$${product.fields.price}"),
-                          // Row for edit and delete buttons
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              IconButton(
-                                icon: Icon(Icons.edit, color: Colors.blue),
-                                onPressed: () {
-                                  // Navigate to edit form, passing the selected product
-                                  // Navigator.push(
-                                  // context,
-                                  // MaterialPageRoute(
-                                  //   builder: (context) => DrugEntryForm(product: product),
-                                  // ),
-                                  // );
-                                },
-                              ),
-                              IconButton(
-                                icon: Icon(Icons.delete, color: Colors.red),
-                                onPressed: () async {
-                                  bool success = await deleteProduct(
-                                      product.pk.toString());
-                                  if (success) {
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(SnackBar(
-                                      content:
-                                          Text('Product successfully deleted'),
-                                    ));
-                                    // Optionally refresh the list or navigate away
-                                  } else {
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(SnackBar(
-                                      content: Text('Failed to delete product'),
-                                    ));
-                                  }
-                                },
-                                // child: Text('Delete Product'),
-                              ),
-                            ],
+                          const SizedBox(width: 16),
+                          // Image widget
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              imageUrl,
+                              fit: BoxFit.cover,
+                              width: 100,
+                              height: 100,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  width: 100,
+                                  height: 100,
+                                  color: Colors.grey.shade200,
+                                  child: const Icon(
+                                    Icons.broken_image,
+                                    color: Colors.grey,
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                         ],
                       ),
@@ -235,8 +277,9 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) =>
-                    AddDrugForm()), // Navigate to the add drug form
+              builder: (context) =>
+                  AddDrugForm(), // Navigate to the add drug form
+            ),
           );
         },
         child: const Icon(Icons.add),
