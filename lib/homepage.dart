@@ -1,5 +1,17 @@
 // lib/homepage.dart
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:sobat_mobile/daftar_favorite/screens/daftar_favorite.dart';
+import 'package:sobat_mobile/daftar_favorite/widgets/list_product.dart';
+import 'package:sobat_mobile/widgets/bottom_navigation.dart';
+import 'package:sobat_mobile/widgets/left_drawer.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:sobat_mobile/authentication/login.dart';
+import 'package:sobat_mobile/widgets/shop_container.dart';
+import 'package:sobat_mobile/widgets/tagline.dart';
+import 'package:sobat_mobile/widgets/widget_custom.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -8,50 +20,149 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
+List<Icon> bottomNavItems = [
+  Icon(Icons.home),
+  Icon(Icons.medication_outlined),
+  Icon(Icons.store),
+];
+
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+
+    String role = request.jsonData['role'];
+    String username = request.jsonData['username'];
+
     return Scaffold(
+      bottomNavigationBar: bottomNavigationBar(request: request),
       appBar: AppBar(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        title: const Wrap(
+          spacing: 10, // Menambahkan jarak antar ikon
+          alignment: WrapAlignment.center,
           children: [
-            IconButton(
-              icon: Icon(Icons.home),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: Icon(Icons.medication_outlined),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: Icon(Icons.favorite),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: Icon(Icons.question_answer),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: Icon(Icons.store),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: Icon(Icons.shopping_cart),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: Icon(Icons.logout),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            )
+            Text("SOBAT"),
           ],
         ),
       ),
-      body: Center(
-        child: Text('Hello, world!'),
+      drawer: LeftDrawer(),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(14.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    "Hey",
+                    style: TextStyle(
+                      fontSize: 28,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Text(
+                    username,
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Text(
+                    "Discover the best medicines and herbal \nremedies for your health",
+                    style: TextStyle(fontSize: 14, color: Colors.black54),
+                  )
+                ],
+              ),
+              SizedBox(
+                height: 25,
+              ),
+              // SizedBox(
+              //   height: 100,
+              //   child: ListView(
+              //     shrinkWrap: true,
+              //     scrollDirection: Axis.horizontal,
+              //     children: [
+              //       cart(),
+              //       cart(),
+              //       cart(),
+              //       cart(),
+              //       cart(),
+              //       cart(),
+              //       cart(),
+              //       cart(),
+              //       cart(),
+              //     ],
+              //   ),
+              // ),
+              Center(
+                child: Text(
+                  "Our Product",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green[300],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Expanded(
+                        child: Image(
+                          image: AssetImage('assets/modern.png'),
+                          fit: BoxFit.contain,
+                          width: double.infinity,
+                          height: 90,
+                        ),
+                      ),
+                      Expanded(
+                        child: Image(
+                          image: AssetImage('assets/traditional.png'),
+                          fit: BoxFit.contain,
+                          width: double.infinity,
+                          height: 90,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // tagline(),
+              SizedBox(
+                height: 20,
+              ),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [WidgetCustom(), WidgetCustom()],
+              // )
+            ],
+          ),
+        ),
       ),
+      // body:
+      // SingleChildScrollView(child:
+      // Center(
+      //   child: role == 'apoteker'
+      //       ? const Text(
+      //           'Welcome, Apoteker!',
+      //           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      //         )
+      //       : const Text(
+      //           'Welcome, Pengguna!',
+      //           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      //         ),
+      // ),
+      // ),
     );
   }
 }
