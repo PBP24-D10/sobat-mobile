@@ -7,6 +7,7 @@ import 'package:sobat_mobile/forum/screens/answers.dart';
 import 'package:sobat_mobile/forum/screens/question_form.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:sobat_mobile/widgets/left_drawer.dart';
 
 class ForumPage extends StatefulWidget {
   const ForumPage({super.key});
@@ -153,6 +154,7 @@ class _ForumPageState extends State<ForumPage> {
 
     return Scaffold(
       backgroundColor: backgroundGreen,
+      drawer: const LeftDrawer(),
       appBar: AppBar(
         title: const Text(
           'Forum Q&A',
@@ -161,10 +163,6 @@ class _ForumPageState extends State<ForumPage> {
         backgroundColor: primaryGreen,
         foregroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
       ),
       body: SingleChildScrollView(
         child: Column(
