@@ -110,7 +110,7 @@ class _productTileState extends State<productTile> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         IconButton(
-                          icon: Icon(Icons.add),
+                          icon: Icon(FontAwesomeIcons.cartShopping),
                           onPressed: () {},
                         ),
                         IconButton(

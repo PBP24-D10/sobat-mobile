@@ -29,7 +29,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
 
-    // String role = request.jsonData['role'];
+    String role = request.jsonData['role'];
 
     return Scaffold(
       bottomNavigationBar: SafeArea(
@@ -37,17 +37,21 @@ class _MyHomePageState extends State<MyHomePage> {
           padding: EdgeInsets.all(1),
           margin: EdgeInsets.symmetric(horizontal: 30, vertical: 30),
           decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.all(
-                Radius.circular(
-                  24,
-                ),
+            color: Colors.white,
+            borderRadius: BorderRadius.all(
+              Radius.circular(
+                24,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: (Colors.green[900] ?? Colors.green).withOpacity(0.3),
-                )
-              ]),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 12.0,
+                spreadRadius: 2.0,
+                offset: Offset(0, 2),
+              )
+            ],
+          ),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 4),
             child: GNav(
@@ -148,33 +152,81 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Padding(
           padding: const EdgeInsets.all(14.0),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              SizedBox(
-                height: 100,
-                child: ListView(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    cart(),
-                    cart(),
-                    cart(),
-                    cart(),
-                    cart(),
-                    cart(),
-                    cart(),
-                    cart(),
-                    cart(),
-                  ],
+              Row(
+                children: [
+                  Text(
+                    "Hello!",
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              // SizedBox(
+              //   height: 100,
+              //   child: ListView(
+              //     shrinkWrap: true,
+              //     scrollDirection: Axis.horizontal,
+              //     children: [
+              //       cart(),
+              //       cart(),
+              //       cart(),
+              //       cart(),
+              //       cart(),
+              //       cart(),
+              //       cart(),
+              //       cart(),
+              //       cart(),
+              //     ],
+              //   ),
+              // ),
+              Center(
+                child: Text(
+                  "Our Product",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green[300],
+                  ),
                 ),
               ),
-              tagline(),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Expanded(
+                        child: Image(
+                          image: AssetImage('assets/modern.png'),
+                          fit: BoxFit.contain,
+                          width: double.infinity,
+                          height: 90,
+                        ),
+                      ),
+                      Expanded(
+                        child: Image(
+                          image: AssetImage('assets/traditional.png'),
+                          fit: BoxFit.contain,
+                          width: double.infinity,
+                          height: 90,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // tagline(),
               SizedBox(
                 height: 20,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [WidgetCustom(), WidgetCustom()],
-              )
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [WidgetCustom(), WidgetCustom()],
+              // )
             ],
           ),
         ),
