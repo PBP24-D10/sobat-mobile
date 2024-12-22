@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:quickalert/quickalert.dart';
 import 'package:sobat_mobile/drug/models/drug_entry.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
@@ -35,20 +36,12 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
     return listProduct;
   }
 
-  Future<String?> fetchCsrfToken() async {
-    try {
-      final response = await http
-          .get(Uri.parse('http://127.0.0.1:8000/favorite/get-csrf-token/'));
-      print('Response Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
-      if (response.statusCode == 200) {
-        final jsonResponse = jsonDecode(response.body);
-        return jsonResponse['csrf_token'];
-      }
-    } catch (error) {
-      print('Error fetching CSRF token: $error');
-    }
-    return null;
+  void showSucces(String productId, CookieRequest request) {
+    QuickAlert.show(
+      context: context,
+      type: QuickAlertType.success,
+      onConfirmBtnTap: () => addToFavorite(productId, request),
+    );
   }
 
   Future<void> addToFavorite(String productId, CookieRequest request) async {
@@ -61,11 +54,32 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
       //   // 'X-CSRFToken': csrfToken, // Menambahkan CSRF token
       // },
 
-      // if (response.statusCode == 200) {
-      //   // Jika berhasil, ubah UI sesuai dengan respons
-      //   print('Produk berhasil ditambahkan ke favorit!');
-      //   // Menampilkan pesan atau memperbarui UI sesuai respons
-      // } else {
+      if (response['status'] == 'success') {
+        // Jika berhasil, tampilkan dialog sukses
+        QuickAlert.show(
+            context: context,
+            type: QuickAlertType.success,
+            title: 'Berhasil!',
+            text: 'Produk berhasil ditambahkan ke favorit.',
+            autoCloseDuration: Duration(seconds: 1),
+            disableBackBtn: true,
+            showConfirmBtn: false);
+
+        print('Produk berhasil ditambahkan ke favorit!');
+        // Menampilkan pesan atau memperbarui UI sesuai respons
+      } else {
+        QuickAlert.show(
+          context: context,
+          type: QuickAlertType.error,
+          title: 'Gagal!',
+          text: 'Produk sudah ada di favorit.',
+          confirmBtnText: 'Kembali',
+          onConfirmBtnTap: () {
+            Navigator.pop(context); // Menutup dialog
+          },
+        );
+      }
+      // else {
       //   print(
       //       'Gagal menambahkan produk ke favorit. Status: ${response.statusCode}');
       //   // Tampilkan pesan error
