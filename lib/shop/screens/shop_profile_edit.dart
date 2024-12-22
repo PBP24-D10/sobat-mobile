@@ -34,9 +34,12 @@ class _ShopEditPageState extends State<ShopEditPage> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.shop.fields.name);
-    _addressController = TextEditingController(text: widget.shop.fields.address);
-    _openingTimeController = TextEditingController(text: widget.shop.fields.openingTime);
-    _closingTimeController = TextEditingController(text: widget.shop.fields.closingTime);
+    _addressController =
+        TextEditingController(text: widget.shop.fields.address);
+    _openingTimeController =
+        TextEditingController(text: widget.shop.fields.openingTime);
+    _closingTimeController =
+        TextEditingController(text: widget.shop.fields.closingTime);
     _currentImageUrl = widget.shop.fields.profileImage;
   }
 
@@ -49,7 +52,8 @@ class _ShopEditPageState extends State<ShopEditPage> {
     super.dispose();
   }
 
-  Future<void> _selectTime(BuildContext context, TextEditingController controller) async {
+  Future<void> _selectTime(
+      BuildContext context, TextEditingController controller) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
@@ -82,7 +86,8 @@ class _ShopEditPageState extends State<ShopEditPage> {
   }
 
   Future<File?> _pickImageNonWeb() async {
-    final pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedImage =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedImage != null) {
       return File(pickedImage.path);
     }
@@ -137,54 +142,55 @@ class _ShopEditPageState extends State<ShopEditPage> {
   }
 
   Future<void> _submitForm(CookieRequest request) async {
-      if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) return;
 
-      try {
-          final shopData = {
+    try {
+      final shopData = {
+        'name': _nameController.text,
+        'address': _addressController.text,
+        'opening_time': formatTime(_openingTimeController.text),
+        'closing_time': formatTime(_closingTimeController.text),
+      };
+
+      if (_selectedImage != null || _selectedImageBase64 != null) {
+        shopData['profile_image'] = _imageToBase64()!;
+      }
+
+      final response = await request.post(
+        '$baseUrl/shop/edit_shop_flutter/${widget.shop.pk}/',
+        shopData,
+      );
+
+      if (response is Map<String, dynamic>) {
+        if (response['status'] == 'success') {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Shop updated successfully!')),
+            );
+
+            // Return updated shop data
+            Navigator.pop(context, {
               'name': _nameController.text,
               'address': _addressController.text,
               'opening_time': formatTime(_openingTimeController.text),
               'closing_time': formatTime(_closingTimeController.text),
-          };
-
-          if (_selectedImage != null || _selectedImageBase64 != null) {
-              shopData['profile_image'] = _imageToBase64()!;
+              'profile_image': response['data']['profile_image'] ??
+                  widget.shop.fields.profileImage,
+            });
           }
-
-          final response = await request.post(
-              '$baseUrl/shop/edit_shop_flutter/${widget.shop.pk}/',
-              shopData,
-          );
-
-          if (response is Map<String, dynamic>) {
-              if (response['status'] == 'success') {
-                  if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Shop updated successfully!')),
-                      );
-                      
-                      // Return updated shop data
-                      Navigator.pop(context, {
-                          'name': _nameController.text,
-                          'address': _addressController.text,
-                          'opening_time': formatTime(_openingTimeController.text),
-                          'closing_time': formatTime(_closingTimeController.text),
-                          'profile_image': response['data']['profile_image'] ?? widget.shop.fields.profileImage,
-                      });
-                  }
-              } else {
-                  throw Exception(response['message'] ?? 'Update failed');
-              }
-          } else {
-              throw Exception('Invalid response format');
-          }
-      } catch (e) {
-          if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Error: $e')),
-              );
-          }
+        } else {
+          throw Exception(response['message'] ?? 'Update failed');
+        }
+      } else {
+        throw Exception('Invalid response format');
       }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    }
   }
 
   Widget _buildCurrentImage() {
@@ -264,7 +270,8 @@ class _ShopEditPageState extends State<ShopEditPage> {
                   labelText: 'Shop Name',
                   border: OutlineInputBorder(),
                 ),
-                validator: (value) => value!.isEmpty ? 'Please enter a shop name' : null,
+                validator: (value) =>
+                    value!.isEmpty ? 'Please enter a shop name' : null,
               ),
               const SizedBox(height: 15),
               TextFormField(
@@ -273,7 +280,8 @@ class _ShopEditPageState extends State<ShopEditPage> {
                   labelText: 'Shop Address',
                   border: OutlineInputBorder(),
                 ),
-                validator: (value) => value!.isEmpty ? 'Please enter a shop address' : null,
+                validator: (value) =>
+                    value!.isEmpty ? 'Please enter a shop address' : null,
               ),
               const SizedBox(height: 15),
               TextFormField(
@@ -284,7 +292,8 @@ class _ShopEditPageState extends State<ShopEditPage> {
                 ),
                 readOnly: true,
                 onTap: () => _selectTime(context, _openingTimeController),
-                validator: (value) => value!.isEmpty ? 'Please select opening time' : null,
+                validator: (value) =>
+                    value!.isEmpty ? 'Please select opening time' : null,
               ),
               const SizedBox(height: 15),
               TextFormField(
@@ -295,7 +304,8 @@ class _ShopEditPageState extends State<ShopEditPage> {
                 ),
                 readOnly: true,
                 onTap: () => _selectTime(context, _closingTimeController),
-                validator: (value) => value!.isEmpty ? 'Please select closing time' : null,
+                validator: (value) =>
+                    value!.isEmpty ? 'Please select closing time' : null,
               ),
               const SizedBox(height: 25),
               ElevatedButton(

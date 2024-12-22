@@ -20,7 +20,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final String baseUrl = 'http://127.0.0.1:8000/media/';
+  final String baseUrl = 'https://m-arvin-sobat.pbp.cs.ui.ac.id/media/';
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
@@ -46,7 +46,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<List<DrugModel>> fetchProductEntries(CookieRequest request) async {
-    final response = await request.get('http://127.0.0.1:8000/product/json/');
+    final response = await request
+        .get('https://m-arvin-sobat.pbp.cs.ui.ac.id/product/json/');
     var data = response;
 
     List<DrugModel> listProduct = [];
@@ -115,8 +116,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 iconActiveColor: Colors.white,
                 iconColor: Colors.black,
                 onPressed: () async {
-                  final response = await request
-                      .logout("http://127.0.0.1:8000/logout_mobile/");
+                  final response = await request.logout(
+                      "https://m-arvin-sobat.pbp.cs.ui.ac.id/logout_mobile/");
                   if (context.mounted && response['status']) {
                     Navigator.pushReplacement(
                       context,
@@ -267,7 +268,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 crossAxisCount: crossAxisCount,
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
-                childAspectRatio: 0.7, // Adjust this value to control item height
+                childAspectRatio:
+                    0.7, // Adjust this value to control item height
               ),
               itemCount: 8,
               itemBuilder: (_, index) {
@@ -378,8 +380,7 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             );
           }
-        }
-      );
+        });
   }
 
   Widget _buildHorizontalShopList() {
@@ -412,7 +413,7 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       // Send POST request to favorite endpoint
       final response = await request.post(
-        'http://127.0.0.1:8000/resep/flutter_add/$productId/',
+        'https://m-arvin-sobat.pbp.cs.ui.ac.id/resep/flutter_add/$productId/',
         {},
       );
 

@@ -68,7 +68,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
   Future<void> editFavorite(
       String favoriteId, String newNote, CookieRequest request) async {
-    // final response = await request.get('http://127.0.0.1:8000/favorite/api/edit/$favoriteId/');
     final url = await request
         .get('https://m-arvin-sobat.pbp.cs.ui.ac.id/favorite/json/');
     var data = url;

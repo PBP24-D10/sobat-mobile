@@ -24,7 +24,7 @@ class CartList extends StatefulWidget {
 class _ProductListScreenState extends State<CartList> {
   List<Resep> favoriteProducts = [];
   double totalPrice = 0;
-  final String baseUrl = 'http://localhost:8000/media/';
+  final String baseUrl = 'https://m-arvin-sobat.pbp.cs.ui.ac.id8000/media/';
   TextEditingController _newController = new TextEditingController();
   // int totalFavorit = 0;
 
@@ -39,7 +39,8 @@ class _ProductListScreenState extends State<CartList> {
   }
 
   Future<List<Resep>> fetchResep(CookieRequest request) async {
-    final response = await request.get('http://127.0.0.1:8000/resep/json/');
+    final response =
+        await request.get('https://m-arvin-sobat.pbp.cs.ui.ac.id/resep/json/');
     var data = response;
 
     // Melakukan konversi data json menjadi object MoodEntry
@@ -52,8 +53,8 @@ class _ProductListScreenState extends State<CartList> {
         String pk = d['pk'];
         productPKMap[b] = pk;
 
-        final responses =
-            await http.get(Uri.parse('http://127.0.0.1:8000/product/json/$b/'));
+        final responses = await http.get(Uri.parse(
+            'https://m-arvin-sobat.pbp.cs.ui.ac.id/product/json/$b/'));
         var test = jsonDecode(responses.body);
         var fields = test[0]["fields"];
         productDetailsMap[b] = fields;
@@ -69,7 +70,8 @@ class _ProductListScreenState extends State<CartList> {
 
   Future<DrugModel> fetchDrugDetails(String productId) async {
     final response = await http.get(
-      Uri.parse('http://127.0.0.1:8000/product/json/$productId/'),
+      Uri.parse(
+          'https://m-arvin-sobat.pbp.cs.ui.ac.id/product/json/$productId/'),
     );
 
     if (response.statusCode == 200) {
@@ -127,7 +129,7 @@ class _ProductListScreenState extends State<CartList> {
   }
 
   void removeAll(CookieRequest request) async {
-    var url = 'http://127.0.0.1:8000/resep/flutter_clear/';
+    var url = 'https://m-arvin-sobat.pbp.cs.ui.ac.id/resep/flutter_clear/';
     try {
       var response = await request.post(url, {});
 
@@ -165,7 +167,7 @@ class _ProductListScreenState extends State<CartList> {
 
   void updateProduct(String id, String action, int index, int newQuantity,
       CookieRequest request) async {
-    var url = 'http://127.0.0.1:8000/resep/flutter_update/';
+    var url = 'https://m-arvin-sobat.pbp.cs.ui.ac.id/resep/flutter_update/';
     try {
       var response = await request.post(url, {
         'resep_id': id,
