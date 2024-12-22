@@ -1,7 +1,9 @@
 // screens/shop_form.dart
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -9,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:sobat_mobile/shop/screens/shop_main_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'dart:html' as html;
 
 class ShopFormPage extends StatefulWidget {
   const ShopFormPage({super.key});
@@ -24,6 +27,7 @@ class _ShopFormPageState extends State<ShopFormPage> {
   final TextEditingController _openingTimeController = TextEditingController();
   final TextEditingController _closingTimeController = TextEditingController();
   File? _selectedImage;
+  String? _selectedImageBase64;
 
   @override
   void dispose() {
@@ -34,7 +38,6 @@ class _ShopFormPageState extends State<ShopFormPage> {
     super.dispose();
   }
 
-  // Time picker
   Future<void> _selectTime(BuildContext context, TextEditingController controller) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
@@ -47,27 +50,67 @@ class _ShopFormPageState extends State<ShopFormPage> {
     }
   }
 
-  // Image picker
-  Future<void> _selectImage() async {
+  Future<String?> _pickImageWeb() async {
+    final completer = Completer<String>();
+    final uploadInput = html.FileUploadInputElement();
+    uploadInput.accept = 'image/*';
+    uploadInput.click();
+
+    uploadInput.onChange.listen((event) async {
+      final file = uploadInput.files?.first;
+      if (file != null) {
+        final reader = html.FileReader();
+        reader.readAsDataUrl(file);
+        reader.onLoadEnd.listen((_) {
+          completer.complete(reader.result as String);
+        });
+      }
+    });
+
+    return completer.future;
+  }
+
+  Future<File?> _pickImageNonWeb() async {
     final pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedImage != null) {
-      setState(() {
-        _selectedImage = File(pickedImage.path);
-      });
+      return File(pickedImage.path);
+    }
+    return null;
+  }
+
+  Future<void> _selectImage() async {
+    if (kIsWeb) {
+      final base64Image = await _pickImageWeb();
+      if (base64Image != null) {
+        setState(() {
+          _selectedImage = null;
+          _selectedImageBase64 = base64Image;
+        });
+      }
+    } else {
+      final pickedImage = await _pickImageNonWeb();
+      if (pickedImage != null) {
+        setState(() {
+          _selectedImage = pickedImage;
+          _selectedImageBase64 = null;
+        });
+      }
     }
   }
 
-  // Convert time format to "HH:MM"
   String formatTime(String time) {
     final DateTime parsedTime = DateFormat.jm().parse(time);
     return DateFormat('HH:mm').format(parsedTime);
   }
 
-  // Convert image to base64
-  String? _imageToBase64(File? image) {
-    if (image == null) return null;
-    final bytes = image.readAsBytesSync();
-    return 'data:image/${image.path.split('.').last};base64,${base64Encode(bytes)}';
+  String? _imageToBase64() {
+    if (kIsWeb) {
+      return _selectedImageBase64;
+    } else if (_selectedImage != null) {
+      final bytes = _selectedImage!.readAsBytesSync();
+      return 'data:image/${_selectedImage!.path.split('.').last};base64,${base64Encode(bytes)}';
+    }
+    return null;
   }
 
   Future<void> _submitForm(CookieRequest request) async {
@@ -78,12 +121,14 @@ class _ShopFormPageState extends State<ShopFormPage> {
       'address': _addressController.text,
       'opening_time': formatTime(_openingTimeController.text),
       'closing_time': formatTime(_closingTimeController.text),
-      'profile_image': _imageToBase64(_selectedImage),
+      'profile_image': _imageToBase64(),
     };
+
+    print('Shop Data to Submit: $shopData');
 
     try {
       final response = await request.post(
-        'http://127.0.0.1:8000/shop/create_shop_flutter/',
+        'http://m-arvin-sobat.pbp.cs.ui.ac.id/shop/create_shop_flutter/',
         shopData,
       );
 
@@ -107,6 +152,22 @@ class _ShopFormPageState extends State<ShopFormPage> {
     }
   }
 
+  Widget buildImagePreview() {
+    if (_selectedImageBase64 != null) {
+      return Image.memory(
+        base64Decode(_selectedImageBase64!.split(',').last),
+        height: 100,
+      );
+    } else if (_selectedImage != null) {
+      return Image.file(
+        _selectedImage!,
+        height: 100,
+      );
+    } else {
+      return const Text('No image selected');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
@@ -122,7 +183,6 @@ class _ShopFormPageState extends State<ShopFormPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Shop Name
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(
@@ -132,8 +192,6 @@ class _ShopFormPageState extends State<ShopFormPage> {
                 validator: (value) => value!.isEmpty ? 'Please enter a shop name' : null,
               ),
               const SizedBox(height: 15),
-
-              // Address
               TextFormField(
                 controller: _addressController,
                 decoration: const InputDecoration(
@@ -143,31 +201,31 @@ class _ShopFormPageState extends State<ShopFormPage> {
                 validator: (value) => value!.isEmpty ? 'Please enter a shop address' : null,
               ),
               const SizedBox(height: 15),
-
-              // Profile Image
               GestureDetector(
                 onTap: _selectImage,
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.image),
-                      const SizedBox(width: 8),
-                      Text(_selectedImage == null
-                          ? 'Select Profile Image'
-                          : 'Image Selected'),
-                    ],
-                  ),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.image),
+                          const SizedBox(width: 8),
+                          const Text('Select Profile Image'),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    buildImagePreview(),
+                  ],
                 ),
               ),
               const SizedBox(height: 15),
-
-              // Opening Time
               TextFormField(
                 controller: _openingTimeController,
                 decoration: const InputDecoration(
@@ -178,8 +236,6 @@ class _ShopFormPageState extends State<ShopFormPage> {
                 onTap: () => _selectTime(context, _openingTimeController),
               ),
               const SizedBox(height: 15),
-
-              // Closing Time
               TextFormField(
                 controller: _closingTimeController,
                 decoration: const InputDecoration(
@@ -190,8 +246,6 @@ class _ShopFormPageState extends State<ShopFormPage> {
                 onTap: () => _selectTime(context, _closingTimeController),
               ),
               const SizedBox(height: 25),
-
-              // Submit Button
               ElevatedButton(
                 onPressed: () => _submitForm(request),
                 child: const Text('Add Shop'),
@@ -201,52 +255,5 @@ class _ShopFormPageState extends State<ShopFormPage> {
         ),
       ),
     );
-  }
-}
-
-
-extension CookieRequestExtension on CookieRequest {
-  Future<Map<String, dynamic>> postWithFiles(
-    String url,
-    Map<String, dynamic> data, {
-    required Map<String, File> files,
-  }) async {
-    final uri = Uri.parse(url);
-    final request = http.MultipartRequest('POST', uri);
-
-    // Add data to body
-    data.forEach((key, value) {
-      if (value is Map) {
-        value.forEach((subKey, subValue) {
-          request.fields['$key[$subKey]'] = subValue.toString();
-        });
-      } else {
-        request.fields[key] = value.toString();
-      }
-    });
-
-    // Add files to request
-    files.forEach((key, file) {
-      request.files.add(http.MultipartFile(
-        key,
-        file.readAsBytes().asStream(),
-        file.lengthSync(),
-        filename: file.path.split('/').last,
-      ));
-    });
-
-    // Add header for cookie authentication
-    request.headers.addAll(headers);
-
-    // Send request
-    final streamedResponse = await request.send();
-    final response = await http.Response.fromStream(streamedResponse);
-
-    return response.statusCode == 200
-        ? Map<String, dynamic>.from(json.decode(response.body))
-        : {
-            'status': 'error',
-            'message': 'Failed with status code ${response.statusCode}',
-          };
   }
 }

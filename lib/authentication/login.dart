@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:sobat_mobile/authentication/register.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginApp extends StatelessWidget {
   const LoginApp({super.key});
@@ -53,7 +54,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Text(
                 "SOBAT",
                 style: GoogleFonts.openSans(
-                  textStyle: TextStyle(
+                  textStyle: const TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
                   ),
@@ -63,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
             Text(
               "Log in on Sobat :)",
               style: GoogleFonts.openSans(
-                textStyle: TextStyle(
+                textStyle: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w300,
                 ),
@@ -74,7 +75,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
+                  SizedBox(
                     height: 200,
                     child: Image.asset("assets/login.png"),
                   ),
@@ -114,10 +115,8 @@ class _LoginPageState extends State<LoginPage> {
                       String role = _roleController.text;
 
                       // Cek kredensial
-                      // Untuk menyambungkan Android emulator dengan Django pada localhost,
-                      // gunakan URL http://10.0.2.2/
                       final response = await request
-                          .login("http://127.0.0.1:8000//login_mobile/", {
+                          .login("http://127.0.0.1:8000/login_mobile/", {
                         'nama': nama,
                         'username': username,
                         'password': password,
@@ -127,6 +126,11 @@ class _LoginPageState extends State<LoginPage> {
                       if (request.loggedIn) {
                         String message = response['message'];
                         String uname = response['username'];
+                        int userId = response['user_id']; // Ambil user_id dari respons
+
+                        // Simpan user_id ke SharedPreferences
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.setInt('user_id', userId);
 
                         if (context.mounted) {
                           Navigator.pushReplacement(
@@ -137,9 +141,7 @@ class _LoginPageState extends State<LoginPage> {
                           ScaffoldMessenger.of(context)
                             ..hideCurrentSnackBar()
                             ..showSnackBar(
-                              SnackBar(
-                                  content:
-                                      Text("$message Selamat datang, $uname.")),
+                              SnackBar(content: Text("$message Selamat datang, $uname.")),
                             );
                         }
                       } else {
@@ -162,9 +164,10 @@ class _LoginPageState extends State<LoginPage> {
                         }
                       }
                     },
+
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      minimumSize: Size(double.infinity, 50),
+                      minimumSize: const Size(double.infinity, 50),
                       backgroundColor: Theme.of(context).colorScheme.primary,
                       padding: const EdgeInsets.symmetric(vertical: 16.0),
                     ),
@@ -189,7 +192,7 @@ class _LoginPageState extends State<LoginPage> {
                                 builder: (context) => const RegisterPage()),
                           );
                         },
-                        child: Text(
+                        child: const Text(
                           'Register',
                           style: TextStyle(
                             color: Colors.green,

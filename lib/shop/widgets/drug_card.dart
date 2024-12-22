@@ -5,7 +5,7 @@ import 'package:sobat_mobile/drug/models/drug_entry.dart';
 
 class DrugCard extends StatelessWidget {
   final DrugModel drug;
-  static const String baseUrl = 'http://localhost:8000'; 
+  static const String baseUrl = 'http://m-arvin-sobat.pbp.cs.ui.ac.id'; 
 
   const DrugCard({super.key, required this.drug});
 

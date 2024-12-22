@@ -1,5 +1,3 @@
-// lib/shop/screens/shop_main_page.dart
-
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -18,18 +16,19 @@ class ShopMainPage extends StatefulWidget {
 }
 
 class _ShopMainPageState extends State<ShopMainPage> {
-  String userRole = '';
-
   Future<List<ShopEntry>> fetchShops(CookieRequest request) async {
     try {
-      // Gunakan localhost untuk web
+      print("Fetching shops..."); // Debug print
       final response = await http.get(
-        Uri.parse('http://localhost:8000/shop/show-json/'),
+        Uri.parse('http://127.0.0.1:8000/shop/show-json/'),
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
       );
+
+      print("Shop response status: ${response.statusCode}"); // Debug print
+      print("Shop response body: ${response.body}"); // Debug print
 
       if (response.statusCode == 200) {
         final List<dynamic> decoded = json.decode(response.body);
@@ -38,40 +37,15 @@ class _ShopMainPageState extends State<ShopMainPage> {
         throw Exception('Failed to load shops: ${response.statusCode}');
       }
     } catch (e) {
-      print("Error fetching shops: $e");
+      print("Error fetching shops: $e"); // Debug print
       rethrow;
     }
-  }
-
-  Future<void> fetchUserRole(CookieRequest request) async {
-    try {
-      // Gunakan localhost untuk web
-      final response = await request.get('http://localhost:8000/auth/get_user_role/');
-      print("Role response: $response"); // Debug print
-      if (response != null && response['role'] != null) {
-        setState(() {
-          userRole = response['role'];
-        });
-        print("User role set to: $userRole"); // Debug print
-      }
-    } catch (e) {
-      print("Error fetching user role: $e"); // Debug print
-      setState(() {
-        userRole = '';
-      });
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    final request = context.read<CookieRequest>();
-    fetchUserRole(request);
   }
 
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
+    print("Building ShopMainPage"); // Debug print
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -125,18 +99,18 @@ class _ShopMainPageState extends State<ShopMainPage> {
           }
         },
       ),
-      floatingActionButton: userRole == 'apoteker'
-          ? FloatingActionButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ShopFormPage()),
-                );
-              },
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              child: const Icon(Icons.add, color: Colors.white),
-            )
-          : null,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          print("FAB pressed"); // Debug print
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const ShopFormPage()),
+          );
+        },
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
     );
   }
 }

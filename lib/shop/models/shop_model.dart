@@ -17,8 +17,6 @@ class ShopEntry {
         fields: Fields.fromJson(json["fields"]),
       );
 
-  Object? get name => null;
-
   Map<String, dynamic> toJson() => {
         "model": model,
         "pk": pk,
