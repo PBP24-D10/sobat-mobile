@@ -149,7 +149,7 @@ class _detailPageState extends State<detailPage> {
                   color: Colors.grey[600],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 10),
               Text(
                 "Tipe Obat",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
@@ -160,6 +160,15 @@ class _detailPageState extends State<detailPage> {
               ),
               const SizedBox(height: 10),
 
+              Text(
+                "Kategori",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              Text(
+                widget.product.category,
+                style: const TextStyle(fontSize: 18),
+              ),
+              const SizedBox(height: 10),
               Text(
                 "Catatan",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
