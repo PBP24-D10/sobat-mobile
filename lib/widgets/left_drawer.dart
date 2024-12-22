@@ -8,6 +8,7 @@ import 'package:sobat_mobile/forum/screens/forum.dart';
 // import 'package:mental_health_tracker/screens/menu.dart';
 import 'package:sobat_mobile/homepage.dart';
 import 'package:sobat_mobile/drug/screens/list_drugentry.dart';
+import 'package:sobat_mobile/resep/screen/resep.dart';
 import 'package:sobat_mobile/shop/screens/shop_main_page.dart';
 
 class LeftDrawer extends StatelessWidget {
@@ -108,7 +109,7 @@ class LeftDrawer extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => const ProductListScreen()),
+                    builder: (context) => CartList()),
               );
             },
           ),

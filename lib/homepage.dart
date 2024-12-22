@@ -25,7 +25,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final String baseUrl = 'http://127.0.0.1:8000/media/';
+  final String baseUrl = 'https://m-arvin-sobat.pbp.cs.ui.ac.id/media/';
 
   @override
   Widget build(BuildContext context) {
@@ -122,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<List<DrugModel>> fetchProductEntries(CookieRequest request) async {
-    final response = await request.get('http://127.0.0.1:8000/product/json/');
+    final response = await request.get('https://m-arvin-sobat.pbp.cs.ui.ac.id/product/json/');
     var data = response;
 
     List<DrugModel> listProduct = [];
@@ -144,7 +144,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<List<ShopEntry>> fetchShops(CookieRequest request) async {
     try {
       final response = await http.get(
-        Uri.parse('http://127.0.0.1:8000/shop/show-json/'),
+        Uri.parse('https://m-arvin-sobat.pbp.cs.ui.ac.id/shop/show-json/'),
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
@@ -224,7 +224,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 iconColor: Colors.black,
                 onPressed: () async {
                   final response = await request
-                      .logout("http://127.0.0.1:8000/logout_mobile/");
+                      .logout("https://m-arvin-sobat.pbp.cs.ui.ac.id/logout_mobile/");
                   if (context.mounted && response['status']) {
                     Navigator.pushReplacement(
                       context,
@@ -290,7 +290,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       MaterialPageRoute(
                         builder: (context) => ProductDetailPage(
                           product: product,
-                          detailRoute: () => addToFavorite(product.pk, request),
+                          detailRoute: () => addToFavorite(product.pk, request), onPressed: () {},
                         ),
                       ),
                     );

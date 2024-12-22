@@ -20,7 +20,7 @@ class _ShopMainPageState extends State<ShopMainPage> {
     try {
       print("Fetching shops..."); // Debug print
       final response = await http.get(
-        Uri.parse('http://127.0.0.1:8000/shop/show-json/'),
+        Uri.parse('https://m-arvin-sobat.pbp.cs.ui.ac.id/shop/show-json/'),
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
@@ -135,8 +135,7 @@ class _ShopMainPageState extends State<ShopMainPage> {
             print("FAB pressed"); // Debug print
             Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (context) => const ShopFormPage()),
+              MaterialPageRoute(builder: (context) => const ShopFormPage()),
             );
           },
           backgroundColor: Colors.green[900]?.withOpacity(0.8),

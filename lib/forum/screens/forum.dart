@@ -19,7 +19,7 @@ class _ForumPageState extends State<ForumPage> {
   List<Question> questions = [];
   List<Question> filteredQuestions = [];
   final TextEditingController _searchController = TextEditingController();
-  final String baseUrl = 'http://127.0.0.1:8000/media/';
+  final String baseUrl = 'https://m-arvin-sobat.pbp.cs.ui.ac.id/media/';
 
   final Color primaryGreen = AppColors.primary;
   final Color secondaryGreen = AppColors.secondary;
@@ -66,13 +66,14 @@ class _ForumPageState extends State<ForumPage> {
 
   Future<DrugModel> fetchProduct(
       CookieRequest request, String productId) async {
-    final response =
-        await request.get('http://127.0.0.1:8000/product/json/$productId/');
+    final response = await request
+        .get('https://m-arvin-sobat.pbp.cs.ui.ac.id/product/json/$productId/');
     return DrugModel.fromJson(response[0]);
   }
 
   Future<List<Question>> fetchQuestions(CookieRequest request) async {
-    final response = await request.get('http://127.0.0.1:8000/forum/json/');
+    final response =
+        await request.get('https://m-arvin-sobat.pbp.cs.ui.ac.id/forum/json/');
     List<Question> listQuestion = [];
 
     for (var d in response) {
@@ -96,8 +97,9 @@ class _ForumPageState extends State<ForumPage> {
 
   Future<void> handleLike(
       CookieRequest request, Question question, int userId) async {
-    final response = await request
-        .post('http://127.0.0.1:8000/forum/like_question/${question.pk}/', {});
+    final response = await request.post(
+        'https://m-arvin-sobat.pbp.cs.ui.ac.id/forum/like_question/${question.pk}/',
+        {});
 
     if (response['status'] == 'success') {
       setState(() {
