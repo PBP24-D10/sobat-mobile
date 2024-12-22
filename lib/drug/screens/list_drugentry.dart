@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:sobat_mobile/drug/models/drug_entry.dart';
@@ -7,7 +6,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:sobat_mobile/drug/screens/drug_detail.dart';
 import 'package:sobat_mobile/drug/screens/drugedit_form.dart';
-import 'package:sobat_mobile/drug/screens/drugentry_form.dart'; // Assuming the form is in this file
+import 'package:sobat_mobile/drug/screens/drugentry_form.dart';
 import 'package:http/http.dart' as http;
 
 class DrugEntryPage extends StatefulWidget {
@@ -18,8 +17,8 @@ class DrugEntryPage extends StatefulWidget {
 }
 
 class _DrugEntryPageState extends State<DrugEntryPage> {
-  // Define the base URL for images
-  final String baseUrl = 'http://127.0.0.1:8000/media/';
+  // Definisikan base URL sekali
+  final String baseUrl = 'http://127.0.0.1:8000/media/'; // Sesuaikan dengan emulator atau perangkat
 
   Future<List<DrugModel>> fetchProductEntries(CookieRequest request) async {
     final response = await request.get('http://127.0.0.1:8000/product/json/');
@@ -30,7 +29,6 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
       if (d != null) {
         try {
           final entry = DrugModel.fromJson(d);
-
           listProduct.add(entry);
         } catch (e) {
           // Handle any error during data parsing
@@ -51,14 +49,12 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
 
   Future<void> addToResep(String productId, CookieRequest request) async {
     try {
-      // Send POST request to favorite endpoint
       final response = await request.post(
         'http://127.0.0.1:8000/resep/flutter_add/$productId/',
         {},
       );
 
       if (response['status'] == 'success') {
-        // If successful, show success dialog
         QuickAlert.show(
           context: context,
           type: QuickAlertType.success,
@@ -70,9 +66,7 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
         );
 
         print('Produk berhasil ditambahkan ke resep!');
-        // Optionally, update the UI or state here
       } else {
-        // If the product is already in favorites, show error dialog
         QuickAlert.show(
           context: context,
           type: QuickAlertType.error,
@@ -86,20 +80,17 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
       }
     } catch (error) {
       print('Terjadi kesalahan: $error');
-      // Optionally, show an error dialog here
     }
   }
 
   Future<void> addToFavorite(String productId, CookieRequest request) async {
     try {
-      // Send POST request to favorite endpoint
       final response = await request.post(
         'http://127.0.0.1:8000/favorite/api/add/$productId/',
         {},
       );
 
       if (response['status'] == 'success') {
-        // If successful, show success dialog
         QuickAlert.show(
           context: context,
           type: QuickAlertType.success,
@@ -111,9 +102,7 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
         );
 
         print('Produk berhasil ditambahkan ke favorit!');
-        // Optionally, update the UI or state here
       } else {
-        // If the product is already in favorites, show error dialog
         QuickAlert.show(
           context: context,
           type: QuickAlertType.error,
@@ -127,7 +116,6 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
       }
     } catch (error) {
       print('Terjadi kesalahan: $error');
-      // Optionally, show an error dialog here
     }
   }
 
@@ -179,16 +167,14 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
                         MaterialPageRoute(
                           builder: (context) => ProductDetailPage(
                             product: product,
-                            detailRoute: () =>
-                                addToFavorite(product.pk, request),
+                            detailRoute: () => addToFavorite(product.pk, request),
                             onPressed: () => addToResep(product.pk, request),
                           ),
                         ),
                       );
                     },
                     child: Container(
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
+                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       padding: const EdgeInsets.all(16.0),
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -218,60 +204,44 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  "Harga: \$${product.fields.price}",
+                                  "Harga: Rp ${product.fields.price}",
                                   style: const TextStyle(
                                     fontSize: 16.0,
                                     color: Colors.black54,
                                   ),
                                 ),
                                 const SizedBox(height: 8),
-                                // Optional: Display description if needed
-                                // Text(
-                                //   "Deskripsi: ${product.fields.desc}",
-                                //   style: const TextStyle(
-                                //     fontSize: 14.0,
-                                //     color: Colors.black54,
-                                //   ),
-                                // ),
-                                const SizedBox(height: 8),
                                 // Row for edit and delete buttons
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
                                     IconButton(
-                                      icon: Icon(Icons.edit,
-                                          color: Colors.blue.shade700),
-                                      onPressed: () {
-                                        // Navigate to edit form, passing the selected product
-                                        Navigator.push(
+                                      icon: Icon(Icons.edit, color: Colors.blue.shade700),
+                                      onPressed: () async {
+                                        // Tunggu sampai EditDrugForm selesai
+                                        await Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) =>
-                                                EditDrugForm(
-                                                    productId: product.pk),
+                                            builder: (context) => EditDrugForm(productId: product.pk),
                                           ),
                                         );
+                                        // Setelah kembali, panggil setState untuk memuat ulang daftar produk
+                                        setState(() {});
                                       },
                                     ),
                                     IconButton(
-                                      icon: Icon(Icons.delete,
-                                          color: Colors.red.shade700),
+                                      icon: Icon(Icons.delete, color: Colors.red.shade700),
                                       onPressed: () async {
-                                        bool success = await deleteProduct(
-                                            product.pk.toString());
+                                        bool success = await deleteProduct(product.pk.toString());
                                         if (success) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(SnackBar(
-                                            content: Text(
-                                                'Product successfully deleted'),
+                                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                            content: Text('Product successfully deleted'),
                                           ));
-                                          // Optionally refresh the list
+                                          // Panggil setState untuk memuat ulang daftar produk
                                           setState(() {});
                                         } else {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(SnackBar(
-                                            content: Text(
-                                                'Failed to delete product'),
+                                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                            content: Text('Failed to delete product'),
                                           ));
                                         }
                                       },
@@ -315,14 +285,16 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
       ),
       // Floating action button to navigate to the drug entry form for adding new drug
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          // Tunggu sampai AddDrugForm selesai
+          await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) =>
-                  AddDrugForm(), // Navigate to the add drug form
+              builder: (context) => AddDrugForm(),
             ),
           );
+          // Setelah kembali, panggil setState untuk memuat ulang daftar produk
+          setState(() {});
         },
         child: const Icon(Icons.add),
         backgroundColor: Colors.blue,
