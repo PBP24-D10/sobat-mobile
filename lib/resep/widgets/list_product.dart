@@ -8,8 +8,8 @@ class ResepTile extends StatefulWidget {
   final String drugForm;
   final String category;
   int quantity; // Jumlah produk
-  final Function(int, String) onQuantityChanged; // Callback untuk perubahan jumlah
-  
+  final Function(int, String)
+      onQuantityChanged; // Callback untuk perubahan jumlah
 
   ResepTile({
     Key? key,
@@ -29,7 +29,7 @@ class ResepTile extends StatefulWidget {
 class _ResepTileState extends State<ResepTile> {
   void _incrementQuantity() {
     setState(() {
-      if (widget.quantity<99) {
+      if (widget.quantity < 99) {
         widget.quantity++;
         widget.onQuantityChanged(widget.quantity, 'increase');
       }
@@ -85,12 +85,16 @@ class _ResepTileState extends State<ResepTile> {
                   children: [
                     Text(
                       widget.name,
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 10),
-                    Text(formattedPrice, style: TextStyle(fontSize: 16, color: Colors.black54)),
-                    Text("Form: ${widget.drugForm}", style: TextStyle(fontSize: 14)),
-                    Text("Category: ${widget.category}", style: TextStyle(fontSize: 14)),
+                    Text(formattedPrice,
+                        style: TextStyle(fontSize: 16, color: Colors.black54)),
+                    Text("Form: ${widget.drugForm}",
+                        style: TextStyle(fontSize: 14)),
+                    Text("Category: ${widget.category}",
+                        style: TextStyle(fontSize: 14)),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -107,7 +111,9 @@ class _ResepTileState extends State<ResepTile> {
                             ),
                           ],
                         ),
-                        Text(subtotal, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        Text(subtotal,
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold)),
                       ],
                     ),
                   ],

@@ -22,7 +22,7 @@ class ShopDetailPage extends StatefulWidget {
 }
 
 class _ShopDetailPageState extends State<ShopDetailPage> {
-  static const String baseUrl = 'http://localhost:8000';
+  static const String baseUrl = 'https://m-arvin-sobat.pbp.cs.ui.ac.id';
   List<DrugModel>? _drugs;
   List<DrugModel> _filteredDrugs = [];
   bool _isLoading = true;
