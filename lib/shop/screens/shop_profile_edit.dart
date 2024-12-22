@@ -1,14 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-import 'package:flutter/foundation.dart';
+import 'dart:typed_data';  // For handling image bytes on all platforms
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:sobat_mobile/shop/models/shop_model.dart';
 import 'package:intl/intl.dart';
-import 'dart:html' as html;
 
 class ShopEditPage extends StatefulWidget {
   final ShopEntry shop;
@@ -25,8 +23,8 @@ class _ShopEditPageState extends State<ShopEditPage> {
   late TextEditingController _addressController;
   late TextEditingController _openingTimeController;
   late TextEditingController _closingTimeController;
-  File? _selectedImage;
-  String? _selectedImageBase64;
+  XFile? _selectedImage;
+  Uint8List? _imageBytes; // For storing the selected image bytes
   String? _currentImageUrl;
   static const String baseUrl = 'http://m-arvin-sobat.pbp.cs.ui.ac.id';
 
@@ -34,12 +32,9 @@ class _ShopEditPageState extends State<ShopEditPage> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.shop.fields.name);
-    _addressController =
-        TextEditingController(text: widget.shop.fields.address);
-    _openingTimeController =
-        TextEditingController(text: widget.shop.fields.openingTime);
-    _closingTimeController =
-        TextEditingController(text: widget.shop.fields.closingTime);
+    _addressController = TextEditingController(text: widget.shop.fields.address);
+    _openingTimeController = TextEditingController(text: widget.shop.fields.openingTime);
+    _closingTimeController = TextEditingController(text: widget.shop.fields.closingTime);
     _currentImageUrl = widget.shop.fields.profileImage;
   }
 
@@ -52,8 +47,7 @@ class _ShopEditPageState extends State<ShopEditPage> {
     super.dispose();
   }
 
-  Future<void> _selectTime(
-      BuildContext context, TextEditingController controller) async {
+  Future<void> _selectTime(BuildContext context, TextEditingController controller) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
@@ -65,74 +59,28 @@ class _ShopEditPageState extends State<ShopEditPage> {
     }
   }
 
-  Future<String?> _pickImageWeb() async {
-    final completer = Completer<String>();
-    final uploadInput = html.FileUploadInputElement();
-    uploadInput.accept = 'image/*';
-    uploadInput.click();
-
-    uploadInput.onChange.listen((event) async {
-      final file = uploadInput.files?.first;
-      if (file != null) {
-        final reader = html.FileReader();
-        reader.readAsDataUrl(file);
-        reader.onLoadEnd.listen((_) {
-          completer.complete(reader.result as String);
-        });
-      }
-    });
-
-    return completer.future;
-  }
-
-  Future<File?> _pickImageNonWeb() async {
-    final pickedImage =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedImage != null) {
-      return File(pickedImage.path);
-    }
-    return null;
-  }
-
   Future<void> _selectImage() async {
-    if (kIsWeb) {
-      final base64Image = await _pickImageWeb();
-      if (base64Image != null) {
-        setState(() {
-          _selectedImage = null;
-          _selectedImageBase64 = base64Image;
-          _currentImageUrl = null;
-        });
-      }
-    } else {
-      final pickedImage = await _pickImageNonWeb();
-      if (pickedImage != null) {
-        setState(() {
-          _selectedImage = pickedImage;
-          _selectedImageBase64 = null;
-          _currentImageUrl = null;
-        });
-      }
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedImage = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedImage != null) {
+      final Uint8List imageBytes = await pickedImage.readAsBytes();
+      setState(() {
+        _selectedImage = pickedImage;
+        _imageBytes = imageBytes;
+        _currentImageUrl = null;  // Clear the current image URL to show the new one
+      });
     }
   }
 
   String? _imageToBase64() {
-    if (kIsWeb && _selectedImageBase64 != null) {
-      return _selectedImageBase64;
-    } else if (_selectedImage != null) {
-      final bytes = _selectedImage!.readAsBytesSync();
-      return 'data:image/${_selectedImage!.path.split('.').last};base64,${base64Encode(bytes)}';
+    if (_imageBytes != null) {
+      return 'data:image/png;base64,${base64Encode(_imageBytes!)}';
     }
     return null;
   }
 
   String formatTime(String time) {
     try {
-      if (time.contains(':') && time.length == 8) {
-        final DateTime parsedTime = DateFormat('HH:mm:ss').parse(time);
-        return DateFormat('HH:mm').format(parsedTime);
-      }
-
       final DateTime parsedTime = DateFormat.jm().parse(time);
       return DateFormat('HH:mm').format(parsedTime);
     } catch (e) {
@@ -144,101 +92,49 @@ class _ShopEditPageState extends State<ShopEditPage> {
   Future<void> _submitForm(CookieRequest request) async {
     if (!_formKey.currentState!.validate()) return;
 
+    final shopData = {
+      'name': _nameController.text,
+      'address': _addressController.text,
+      'opening_time': formatTime(_openingTimeController.text),
+      'closing_time': formatTime(_closingTimeController.text),
+      'profile_image': _imageToBase64(),
+    };
+
     try {
-      final shopData = {
-        'name': _nameController.text,
-        'address': _addressController.text,
-        'opening_time': formatTime(_openingTimeController.text),
-        'closing_time': formatTime(_closingTimeController.text),
-      };
-
-      if (_selectedImage != null || _selectedImageBase64 != null) {
-        shopData['profile_image'] = _imageToBase64()!;
-      }
-
       final response = await request.post(
         '$baseUrl/shop/edit_shop_flutter/${widget.shop.pk}/',
         shopData,
       );
 
-      if (response is Map<String, dynamic>) {
-        if (response['status'] == 'success') {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Shop updated successfully!')),
-            );
-
-            // Return updated shop data
-            Navigator.pop(context, {
-              'name': _nameController.text,
-              'address': _addressController.text,
-              'opening_time': formatTime(_openingTimeController.text),
-              'closing_time': formatTime(_closingTimeController.text),
-              'profile_image': response['data']['profile_image'] ??
-                  widget.shop.fields.profileImage,
-            });
-          }
-        } else {
-          throw Exception(response['message'] ?? 'Update failed');
-        }
-      } else {
-        throw Exception('Invalid response format');
-      }
-    } catch (e) {
-      if (mounted) {
+      if (response['status'] == 'success') {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text('Shop updated successfully!')),
+        );
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update shop: ${response['message']}')),
         );
       }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
     }
   }
 
-  Widget _buildCurrentImage() {
-    if (_selectedImage != null || _selectedImageBase64 != null) {
-      return Container(
+  Widget _buildImagePreview() {
+    if (_imageBytes != null) {
+      return Image.memory(_imageBytes!, height: 200, fit: BoxFit.cover);
+    } else if (_currentImageUrl != null && _currentImageUrl!.isNotEmpty) {
+      return Image.network(
+        _currentImageUrl!.startsWith('http') ? _currentImageUrl! : '$baseUrl$_currentImageUrl',
         height: 200,
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Center(
-          child: Text(_selectedImage != null || _selectedImageBase64 != null
-              ? 'New image selected'
-              : 'No image selected'),
-        ),
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => const Center(child: Text('Error loading image')),
       );
     }
-
-    if (_currentImageUrl != null && _currentImageUrl!.isNotEmpty) {
-      return Container(
-        height: 200,
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: Image.network(
-            _currentImageUrl!.startsWith('http')
-                ? _currentImageUrl!
-                : '$baseUrl$_currentImageUrl',
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return const Center(child: Text('Error loading image'));
-            },
-          ),
-        ),
-      );
-    }
-
-    return Container(
-      height: 200,
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: const Center(child: Text('No image available')),
-    );
+    return const Text('No image selected');
   }
 
   @override
@@ -256,7 +152,7 @@ class _ShopEditPageState extends State<ShopEditPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildCurrentImage(),
+              _buildImagePreview(),
               const SizedBox(height: 15),
               ElevatedButton.icon(
                 onPressed: _selectImage,
