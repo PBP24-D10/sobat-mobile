@@ -109,7 +109,6 @@ class ProductDetailPage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Row(
-                
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(8.0),

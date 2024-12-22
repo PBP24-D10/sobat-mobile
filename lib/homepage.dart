@@ -29,7 +29,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
 
-    // String role = request.jsonData['role'];
+    String role = request.jsonData['role'];
 
     return Scaffold(
       bottomNavigationBar: SafeArea(
