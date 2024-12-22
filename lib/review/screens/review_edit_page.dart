@@ -1,22 +1,46 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:sobat_mobile/widgets/left_drawer.dart';
 
-class ReviewFormPage extends StatefulWidget {
-  const ReviewFormPage({super.key});
+class EditReviewPage extends StatefulWidget {
+  final String reviewID;
+  final String productID;
+  final int initialRating;
+  final String initialComment;
+
+  const EditReviewPage({
+    super.key,
+    required this.reviewID,
+    required this.productID,
+    required this.initialRating,
+    required this.initialComment,
+  });
 
   @override
-  State<ReviewFormPage> createState() => _ReviewFormPageState();
+  State<EditReviewPage> createState() => _EditReviewPageState();
 }
 
-class _ReviewFormPageState extends State<ReviewFormPage> {
+class _EditReviewPageState extends State<EditReviewPage> {
   final _formKey = GlobalKey<FormState>();
   String _comment = "";
   int? _rating;
 
   @override
+  void initState() {
+    super.initState();
+    _rating = widget.initialRating;
+    _comment = widget.initialComment;
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
     return Scaffold(
+      drawer: LeftDrawer(),
       appBar: AppBar(
-        title: const Text('Review Form'),
+        title: const Text('Edit Review'),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
       ),
@@ -30,6 +54,7 @@ class _ReviewFormPageState extends State<ReviewFormPage> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: DropdownButtonFormField<int>(
+                  value: _rating,
                   decoration: InputDecoration(
                     hintText: "Rating",
                     labelText: "Rating",
@@ -60,6 +85,7 @@ class _ReviewFormPageState extends State<ReviewFormPage> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
+                  initialValue: _comment,
                   decoration: InputDecoration(
                     hintText: "Comment",
                     labelText: "Comment",
@@ -78,6 +104,9 @@ class _ReviewFormPageState extends State<ReviewFormPage> {
                     }
                     return null;
                   },
+                  keyboardType: TextInputType.multiline,
+                  minLines: 3,
+                  maxLines: null,
                 ),
               ),
               Align(
@@ -85,42 +114,42 @@ class _ReviewFormPageState extends State<ReviewFormPage> {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all(
-                          Theme.of(context).colorScheme.primary),
-                    ),
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text('Review saved'),
-                              content: SingleChildScrollView(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Rating: $_rating'),
-                                    Text('Comment: $_comment')
-                                  ],
-                                ),
-                              ),
-                              actions: [
-                                TextButton(
-                                  child: const Text('OK'),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    _formKey.currentState!.reset();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
+                        final response = await request.postJson(
+                          "http://m-arvin-sobat.pbp.cs.ui.ac.id/review/${widget.productID}/${widget.reviewID}/edit-flutter/",
+                          jsonEncode(<String, dynamic>{
+                            'rating': _rating,
+                            'comment': _comment,
+                          }),
                         );
+                        if (context.mounted) {
+                          if (response['status'] == 'success') {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Review has been updated!"),
+                              ),
+                            );
+                            Navigator.pop(context, true);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                    "An error occurred. Please try again."),
+                              ),
+                            );
+                          }
+                        }
                       }
                     },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
+                    ),
                     child: const Text(
-                      "Save",
+                      "Update",
                       style: TextStyle(color: Colors.white),
                     ),
                   ),

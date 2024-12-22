@@ -1,75 +1,202 @@
-// lib/screens/product_detail.dart
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:quickalert/quickalert.dart';
 import 'package:sobat_mobile/drug/models/drug_entry.dart';
+import 'package:sobat_mobile/drug/widgets/button_review.dart';
+import 'package:sobat_mobile/forum/screens/forum.dart';
+import 'package:sobat_mobile/review/screens/review_page.dart';
 
 class ProductDetailPage extends StatelessWidget {
   final DrugModel product;
+  //  final DrugEntry product;
+  final void Function()? detailRoute;
+  final void Function()? onPressed;
 
-  const ProductDetailPage({super.key, required this.product});
+  String formatedPrice(int price) {
+    final formattedPrice = NumberFormat.currency(
+      locale: 'id_ID', // Locale Indonesia
+      symbol: 'Rp ', // Simbol mata uang
+      decimalDigits: 0, // Tanpa desimal
+    ).format(price);
+    return formattedPrice;
+  }
+
+  const ProductDetailPage(
+      {super.key,
+      required this.product,
+      required this.detailRoute,
+      required this.onPressed});
+
+  // Define the base URL
+  final String baseUrl = 'https://m-arvin-sobat.pbp.cs.ui.ac.id/media/';
 
   @override
   Widget build(BuildContext context) {
+    void showReview() {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ReviewPage(
+              productID: product.pk,
+              productName: product.fields.name,
+              productPrice: product.fields.price.toString(),
+              image: product.fields.image),
+        ),
+      );
+    }
+
+    void showForum() {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ForumPage(),
+        ),
+      );
+    }
+
+    String imageUrl = '$baseUrl${product.fields.image}';
+
     return Scaffold(
-      // AppBar dengan tombol kembali otomatis
       appBar: AppBar(
         title: Text(product.fields.name),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Nama Produk
-            const Text(
-              "Nama Produk:",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            Text(
-              product.fields.name,
-              style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 16),
-            // Deskripsi Produk
-            const Text(
-              "Deskripsi:",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            Text(
-              product.fields.desc,
-              style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 16),
-            // Harga Produk
-            const Text(
-              "Harga:",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            Text(
-              "\$${product.fields.price.toString()}",
-              style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 16),
-            // Tambahkan atribut lain jika ada
-            // Contoh: Stok Produk
-            // if (product.fields.stock != null) ...[
-              const Text(
-                "Stok:",
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Favorite Button
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                    onPressed: detailRoute,
+                    icon: CircleAvatar(
+                      radius: 18,
+                      backgroundColor: Colors.red,
+                      child: Icon(
+                        Icons.favorite,
+                        color: Colors.white,
+                      ),
+                    ),
+                    iconSize: 30,
+                  ),
+                ],
+              ),
+              // Image
+              Center(
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                  width: 600,
+                  height: 600,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Text('Unable to load image',
+                        textAlign: TextAlign.center);
+                  },
+                ),
+              ),
+              const SizedBox(height: 24),
+              // Product Details
+              Text(
+                product.fields.name,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
+              ),
+              Text(
+                product.fields.drugForm,
+                style: const TextStyle(fontSize: 20),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: customButton(
+                        onPressed: () => showReview(),
+                        icon: FontAwesomeIcons.commentDots,
+                        text: "Review"),
+                  ),
+                  customButton(
+                      onPressed: () => showForum(),
+                      icon: FontAwesomeIcons.solidComments,
+                      text: "Forum"),
+                ],
+              ),
+              Text(
+                "Deskripsi",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               Text(
-                product.fields.price.toString(),
+                product.fields.desc,
+                style: TextStyle(
+                  fontSize: 18,
+                  height: 1.5,
+                  color: Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                "Tipe Obat:",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              Text(
+                product.fields.drugType,
                 style: const TextStyle(fontSize: 18),
               ),
-              const SizedBox(height: 16),
-            // ],
-            // Tombol Kembali (Opsional, karena AppBar sudah memiliki tombol kembali)
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text("Kembali"),
-            ),
-          ],
+              const SizedBox(height: 10),
+            ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          padding: const EdgeInsets.all(25),
+          color: const Color.fromARGB(255, 149, 191, 116),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "${formatedPrice(product.fields.price)}",
+                style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold),
+              ),
+              GestureDetector(
+                onTap: onPressed,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Row(
+                      children: [
+                        Icon(
+                          FontAwesomeIcons.cartShopping,
+                          color: Colors.white,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Add To Cart',
+                          style: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
