@@ -115,7 +115,7 @@ class _EditReviewPageState extends State<EditReviewPage> {
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         final response = await request.postJson(
-                          "http://127.0.0.1:8000/review/${widget.productID}/${widget.reviewID}/edit-flutter/",
+                          "http://m-arvin-sobat.pbp.cs.ui.ac.id/review/${widget.productID}/${widget.reviewID}/edit-flutter/",
                           jsonEncode(<String, dynamic>{
                             'rating': _rating,
                             'comment': _comment,
