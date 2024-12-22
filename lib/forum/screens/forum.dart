@@ -1,10 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:sobat_mobile/drug/models/drug_entry.dart';
-import 'package:sobat_mobile/forum/models/answer_entry.dart';
 import 'package:sobat_mobile/forum/models/question_entry.dart';
 import 'package:sobat_mobile/forum/screens/answers.dart';
 import 'package:sobat_mobile/forum/screens/question_form.dart';
-import 'package:sobat_mobile/widgets/left_drawer.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 
@@ -17,13 +16,54 @@ class ForumPage extends StatefulWidget {
 
 class _ForumPageState extends State<ForumPage> {
   List<Question> questions = [];
+  List<Question> filteredQuestions = [];
+  final TextEditingController _searchController = TextEditingController();
   final String baseUrl = 'http://127.0.0.1:8000/media/';
 
-  Future<String> fetchProductImage(
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void filterQuestions(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        filteredQuestions = List.from(questions);
+      } else {
+        filteredQuestions = questions.where((question) {
+          final titleMatch = question.fields.questionTitle
+              .toLowerCase()
+              .contains(query.toLowerCase());
+          final contentMatch = question.fields.question
+              .toLowerCase()
+              .contains(query.toLowerCase());
+
+          bool drugMatch = false;
+          if (question.fields.drugAsked.isNotEmpty) {
+            try {
+              final drugInfo = json.decode(question.fields.drugAsked);
+              drugMatch = drugInfo["name"]
+                  .toString()
+                  .toLowerCase()
+                  .contains(query.toLowerCase());
+            } catch (e) {
+              // Handle parsing error
+              drugMatch = false;
+            }
+          }
+
+          return titleMatch || contentMatch || drugMatch;
+        }).toList();
+      }
+    });
+  }
+
+  Future<DrugModel> fetchProduct(
       CookieRequest request, String productId) async {
     final response =
         await request.get('http://127.0.0.1:8000/product/json/$productId/');
-    return DrugModel.fromJson(response[0]).fields.image;
+    return DrugModel.fromJson(response[0]);
   }
 
   Future<List<Question>> fetchQuestions(CookieRequest request) async {
@@ -36,8 +76,11 @@ class _ForumPageState extends State<ForumPage> {
 
         if (question.fields.drugAsked != "") {
           String productId = question.fields.drugAsked;
-          String productImage = await fetchProductImage(request, productId);
-          question.fields.drugAsked = productImage;
+          DrugModel product = await fetchProduct(request, productId);
+          question.fields.drugAsked = json.encode({
+            "image": product.fields.image,
+            "name": product.fields.name,
+          });
         }
 
         listQuestion.add(question);
@@ -95,234 +138,462 @@ class _ForumPageState extends State<ForumPage> {
     }
   }
 
+  final Color primaryGreen = const Color(0xFF2E7D32); // darker green
+  final Color secondaryGreen = const Color(0xFF81C784); // lighter green
+  final Color backgroundGreen = const Color(0xFFE8F5E9); // very light green
+
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
     int userId = request.jsonData['id'];
 
     return Scaffold(
+      backgroundColor: backgroundGreen,
       appBar: AppBar(
-        title: const Text('Forum Q&A'),
+        title: const Text(
+          'Forum Q&A',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: primaryGreen,
+        foregroundColor: Colors.white,
+        elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16.0),
-            child: const Text(
-              "Ask questions, get answers, and share your knowledge with the community!",
-              style: TextStyle(
-                color: Color.fromARGB(255, 33, 77, 29),
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: primaryGreen,
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
+                ),
               ),
-              textAlign: TextAlign.center,
+              child: const Text(
+                "Ask questions, get answers, and share your knowledge with the community!",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ),
-          ),
-          Expanded(
-            child: FutureBuilder(
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: TextField(
+                controller: _searchController,
+                onChanged: filterQuestions,
+                decoration: InputDecoration(
+                  hintText: 'Search questions...',
+                  prefixIcon: Icon(Icons.search, color: primaryGreen),
+                  suffixIcon: _searchController.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            _searchController.clear();
+                            filterQuestions('');
+                          },
+                        )
+                      : null,
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: primaryGreen),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: primaryGreen, width: 2),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: primaryGreen.withOpacity(0.5)),
+                  ),
+                ),
+              ),
+            ),
+            FutureBuilder(
               future: fetchQuestions(request),
               builder: (context, AsyncSnapshot snapshot) {
                 if (snapshot.data == null) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (!snapshot.hasData) {
-                  return const Column(
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        'Belum ada pertanyaan pada forum.',
-                        style:
-                            TextStyle(fontSize: 20, color: Color(0xff59A5D8)),
+                      Icon(
+                        Icons.question_answer_outlined,
+                        size: 64,
+                        color: primaryGreen,
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 16),
+                      Text(
+                        'There are no questions yet...',
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: primaryGreen,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ],
                   );
                 } else {
                   questions = snapshot.data!;
-                  return ListView.builder(
-                      itemCount: questions.length,
-                      itemBuilder: (_, index) => GestureDetector(
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 12),
-                            padding: const EdgeInsets.all(12.0),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.3),
-                                  spreadRadius: 2,
-                                  blurRadius: 5,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
+                  if (filteredQuestions.isEmpty &&
+                      _searchController.text.isEmpty) {
+                    filteredQuestions = List.from(questions);
+                  }
+
+                  if (filteredQuestions.isEmpty &&
+                      _searchController.text.isNotEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.search_off,
+                            size: 64,
+                            color: primaryGreen,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No questions found',
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: primaryGreen,
+                              fontWeight: FontWeight.w500,
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    if (questions[index].fields.drugAsked != "")
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: Image.network(
-                                          baseUrl + questions[index].fields.drugAsked,
-                                          height: 80,
-                                          width: 80,
-                                          fit: BoxFit.cover,
-                                          errorBuilder:
-                                              (context, error, stackTrace) {
-                                            return Container(
-                                              height: 80,
-                                              width: 80,
-                                              color: Colors.grey[300],
-                                              child: const Center(
-                                                child: Text('No Image'),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Text(
-                                        questions[index].fields.questionTitle,
-                                        style: const TextStyle(
-                                          fontSize: 18.0,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.only(bottom: 100),
+                    itemCount: filteredQuestions.length,
+                    itemBuilder: (_, index) => Container(
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: filteredQuestions[index].fields.role == "apoteker"
+                            ? const Color.fromARGB(255, 220, 252, 231)
+                            : Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        border: Border.all(
+                          color: primaryGreen,
+                          width: 1.0,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.2),
+                            spreadRadius: 1,
+                            blurRadius: 6,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            IntrinsicHeight(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (filteredQuestions[index]
+                                          .fields
+                                          .drugAsked !=
+                                      "") ...[
+                                    SizedBox(
+                                      width: 80,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          _buildDrugImage(filteredQuestions[index]
+                                              .fields
+                                              .drugAsked),
+                                          const SizedBox(height: 8),
+                                          _buildDrugName(filteredQuestions[index]
+                                              .fields
+                                              .drugAsked),
+                                        ],
                                       ),
                                     ),
                                   ],
-                                ),
-                                const SizedBox(height: 12),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 12.0),
-                                  child: Text(
-                                    questions[index].fields.question,
-                                    style: const TextStyle(fontSize: 16.0),
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Row(
                                           children: [
-                                            IconButton(
-                                              onPressed: () {
-                                                handleLike(request,
-                                                    questions[index], userId);
-                                              },
-                                              icon: Icon(
-                                                questions[index]
-                                                        .fields
-                                                        .likes
-                                                        .contains(userId)
-                                                    ? Icons.favorite
-                                                    : Icons.favorite_border,
-                                                color: Colors.red,
-                                              ),
-                                              iconSize: 24,
-                                            ),
                                             Text(
-                                                "${questions[index].fields.numLikes}"),
+                                              "by ${filteredQuestions[index].fields.username}",
+                                              style: const TextStyle(
+                                                color: Color.fromARGB(
+                                                    255, 47, 47, 47),
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            if (filteredQuestions[index]
+                                                    .fields
+                                                    .role ==
+                                                "apoteker")
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 8,
+                                                  vertical: 4,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  border: Border.all(
+                                                    color: primaryGreen,
+                                                    width: 1.0,
+                                                  ),
+                                                ),
+                                                child: const Text(
+                                                  "Apoteker",
+                                                  style: TextStyle(
+                                                    fontSize: 13.0,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Color.fromARGB(
+                                                        255, 47, 47, 47),
+                                                  ),
+                                                ),
+                                              ),
                                           ],
                                         ),
-                                        const SizedBox(width: 12),
-                                        Row(
-                                          children: [
-                                            IconButton(
-                                              onPressed: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        AnswersPage(
-                                                      question:
-                                                          questions[index],
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                              icon: const Icon(Icons.comment),
-                                              iconSize: 24,
-                                            ),
-                                            Text(
-                                                "${questions[index].fields.numAnswer}"),
-                                          ],
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          filteredQuestions[index]
+                                              .fields
+                                              .questionTitle,
+                                          style: const TextStyle(
+                                            fontSize: 18.0,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          filteredQuestions[index]
+                                              .fields
+                                              .question,
+                                          style: const TextStyle(
+                                            fontSize: 15.0,
+                                            height: 1.4,
+                                          ),
                                         ),
                                       ],
                                     ),
-                                    // Delete button
-                                    IconButton(
-                                      onPressed: () {
-                                        // Show confirmation dialog
-                                        showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return AlertDialog(
-                                              title:
-                                                  const Text('Delete Question'),
-                                              content: const Text(
-                                                  'Are you sure you want to delete this question?'),
-                                              actions: [
-                                                TextButton(
-                                                  onPressed: () {
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                  child: const Text('Cancel'),
-                                                ),
-                                                TextButton(
-                                                  onPressed: () {
-                                                    Navigator.of(context).pop();
-                                                    handleDelete(request,
-                                                        questions[index]);
-                                                  },
-                                                  child: const Text('Delete'),
-                                                ),
-                                              ],
-                                            );
-                                          },
-                                        );
-                                      },
-                                      icon: const Icon(Icons.delete),
-                                      iconSize: 24,
-                                    ),
-                                  ],
-                                ),
-                                if (index == questions.length-1)
-                                  const SizedBox(height: 80),
-                              ],
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
+                            const SizedBox(height: 12),
+                            _buildActionButtons(context, filteredQuestions[index],
+                                request, userId),
+                          ],
                         ),
+                      ),
+                    ),
                   );
                 }
               },
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFF254922),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: primaryGreen,
         onPressed: () {
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const QuestionFormPage(),
+            context,
+            MaterialPageRoute(
+              builder: (context) => const QuestionFormPage(),
+            ),
+          );
+        },
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: const Text(
+          'Ask Question',
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDrugImage(String drugAskedJson) {
+    Map<String, dynamic> drugInfo = json.decode(drugAskedJson);
+    return Container(
+      height: 80,
+      width: 80,
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: primaryGreen,
+          width: 1.0,
+        ),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Image.network(
+          baseUrl + drugInfo["image"],
+          height: 80,
+          width: 80,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              height: 80,
+              width: 80,
+              decoration: BoxDecoration(
+                color: secondaryGreen.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: Icon(
+                  Icons.image_not_supported,
+                  color: primaryGreen,
+                ),
               ),
             );
-        },
-        child: const Icon(Icons.add, color: Colors.white),
+          },
+        ),
       ),
+    );
+  }
+
+  Widget _buildDrugName(String drugAskedJson) {
+    Map<String, dynamic> drugInfo = json.decode(drugAskedJson);
+    return Center(
+      child: Text(
+        drugInfo["name"],
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 14.0,
+          fontWeight: FontWeight.w500,
+          color: primaryGreen,
+        ),
+        overflow: TextOverflow.ellipsis,
+        maxLines: 2,
+      ),
+    );
+  }
+
+  Widget _buildActionButtons(BuildContext context, Question question,
+      CookieRequest request, int userId) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 8,
+        vertical: 4,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.grey.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              IconButton(
+                onPressed: () => handleLike(request, question, userId),
+                icon: Icon(
+                  question.fields.likes.contains(userId)
+                      ? Icons.favorite
+                      : Icons.favorite_border,
+                  color: Colors.red,
+                ),
+                iconSize: 22,
+              ),
+              Text(
+                "${question.fields.numLikes}",
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(width: 4),
+              IconButton(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AnswersPage(question: question),
+                    ),
+                  );
+                },
+                icon: Icon(
+                  Icons.comment_outlined,
+                  color: primaryGreen,
+                ),
+                iconSize: 22,
+              ),
+              Text(
+                "${question.fields.numAnswer}",
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
+            ],
+          ),
+          if (question.fields.user == userId) ...[
+            IconButton(
+              onPressed: () => _showDeleteDialog(context, question, request),
+              icon: const Icon(
+                Icons.delete_outline,
+                color: Colors.red,
+              ),
+              iconSize: 22,
+            ),
+          ]
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteDialog(
+      BuildContext context, Question question, CookieRequest request) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Question'),
+          content: const Text('Are you sure you want to delete this question?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: primaryGreen),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                handleDelete(request, question);
+              },
+              child: const Text(
+                'Delete',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
