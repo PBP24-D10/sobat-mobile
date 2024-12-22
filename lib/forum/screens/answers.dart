@@ -79,7 +79,7 @@ class _AnswersPageState extends State<AnswersPage> {
   Future<void> handleLike(
       CookieRequest request, Answer answer, int userId) async {
     final response = await request
-        .post('http://127.0.0.1:8000/forum/like_answer/${answer.pk}/', {});
+        .post('http://127.0.0.1:8000/like_answer/${answer.pk}/', {});
 
     if (response['status'] == 'success') {
       setState(() {
