@@ -10,7 +10,7 @@ class ReviewPage extends StatefulWidget {
   final String productPrice;
   final String productID;
   final String image;
-  final String baseUrl = 'http://127.0.0.1:8000/media/';
+  final String baseUrl = 'http://m-arvin-sobat.pbp.cs.ui.ac.id/media/';
 
   const ReviewPage({
     super.key,
@@ -27,7 +27,7 @@ class ReviewPage extends StatefulWidget {
 class _ReviewPageState extends State<ReviewPage> {
   Future<List<Review>> fetchReviews(CookieRequest request) async {
     var id = widget.productID;
-    final response = await request.get('http://127.0.0.1:8000/review/$id/json/');
+    final response = await request.get('http://m-arvin-sobat.pbp.cs.ui.ac.id/review/$id/json/');
     var data = response;
     List<Review> reviewList = [];
     for (var d in data) {

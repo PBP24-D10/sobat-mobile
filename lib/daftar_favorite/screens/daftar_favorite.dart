@@ -32,10 +32,10 @@ class _ProductListScreenState extends State<ProductListScreen> {
   void initState() {
     super.initState();
 
-    fetchFuture = fetchMood(CookieRequest()); // Memuat data awal
+    fetchFuture = fetchProduct(CookieRequest()); // Memuat data awal
   }
 
-  Future<List<FavoriteEntry>> fetchMood(CookieRequest request) async {
+  Future<List<FavoriteEntry>> fetchProduct(CookieRequest request) async {
     final response = await request.get('http://127.0.0.1:8000/favorite/json/');
     var data = response;
 
@@ -153,7 +153,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
       );
 
       if (response.statusCode == 200) {
-        List<FavoriteEntry> updatedFavorites = await fetchMood(CookieRequest());
+        List<FavoriteEntry> updatedFavorites =
+            await fetchProduct(CookieRequest());
         setState(
           () {
             favoriteProducts = updatedFavorites; // Perbarui state
@@ -181,7 +182,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
         title: const Text("Daftar Produk Favorit"),
       ),
       body: FutureBuilder(
-        future: fetchMood(CookieRequest()),
+        future: fetchProduct(CookieRequest()),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -222,12 +223,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
                         ;
 
-                        // Get the product details from the map (this should be updated once product data is loaded)
-                        // Map<String, dynamic>? productDetails =
-                        //     productDetailsMap[productId];
-                        // String productName = productDetails != null
-                        //     ? productDetails['fields']['name']
-                        //     : 'Loading...';
+                       
 
                         return Padding(
                           padding: const EdgeInsets.symmetric(

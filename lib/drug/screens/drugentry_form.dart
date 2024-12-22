@@ -47,7 +47,7 @@ class _AddDrugFormState extends State<AddDrugForm> {
 
   Future<void> submitDrug() async {
     if (_formKey.currentState!.validate()) {
-      var uri = Uri.parse('http://localhost:8000/product/create-drug-ajax/');
+      var uri = Uri.parse('http://m-arvin-sobat.pbp.cs.ui.ac.id/product/create-drug-ajax/');
       var request = http.MultipartRequest('POST', uri)
         ..fields['name'] = nameController.text
         ..fields['desc'] = descController.text

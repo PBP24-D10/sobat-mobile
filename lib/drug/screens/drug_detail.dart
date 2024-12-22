@@ -24,7 +24,7 @@ class ProductDetailPage extends StatelessWidget {
       {super.key, required this.product, required this.detailRoute});
 
   // Define the base URL
-  final String baseUrl = 'http://localhost:8000/media/';
+  final String baseUrl = 'http://m-arvin-sobat.pbp.cs.ui.ac.id/media/';
 
   @override
   Widget build(BuildContext context) {
