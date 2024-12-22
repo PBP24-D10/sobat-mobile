@@ -24,10 +24,13 @@ class ProductDetailPage extends StatelessWidget {
   }
 
   const ProductDetailPage(
-      {super.key, required this.product, required this.detailRoute, required this.onPressed});
+      {super.key,
+      required this.product,
+      required this.detailRoute,
+      required this.onPressed});
 
   // Define the base URL
-  final String baseUrl = 'http://127.0.0.1:8000/media/';
+  final String baseUrl = 'https://m-arvin-sobat.pbp.cs.ui.ac.id/media/';
 
   @override
   Widget build(BuildContext context) {

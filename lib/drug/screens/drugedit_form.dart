@@ -30,7 +30,7 @@ class _EditDrugFormState extends State<EditDrugForm> {
   String? _imageName;
   bool _isLoading = true; // To handle loading state
   String? existingImageUrl;
-  final String baseUrl = 'http://127.0.0.1:8000/media/'; // Adjust if needed
+  final String baseUrl = 'https://m-arvin-sobat.pbp.cs.ui.ac.id/media/'; // Adjust if needed
 
   @override
   void initState() {
@@ -43,7 +43,7 @@ class _EditDrugFormState extends State<EditDrugForm> {
       // print('error');
       // print(widget.productId);
       final response = await http.get(Uri.parse(
-        'http://127.0.0.1:8000/product/json/${widget.productId}/')); // Adjust endpoint
+        'https://m-arvin-sobat.pbp.cs.ui.ac.id/json/${widget.productId}/')); // Adjust endpoint
       if (response.statusCode == 200) {
         final List<DrugModel> data = welcomeFromJson(response.body);
         print('Fetched DrugModel Data: ${data[0].toJson()}'); // Debugging
@@ -106,7 +106,7 @@ class _EditDrugFormState extends State<EditDrugForm> {
   Future<void> submitEdit() async {
     if (_formKey.currentState!.validate()) {
       var uri = Uri.parse(
-          'http://127.0.0.1:8000/product/edit-drug-ajax/${widget.productId}/');
+          'https://m-arvin-sobat.pbp.cs.ui.ac.id/product/edit-drug-ajax/${widget.productId}/');
       var request = http.MultipartRequest('POST', uri)
         ..fields['name'] = nameController.text
         ..fields['desc'] = descController.text

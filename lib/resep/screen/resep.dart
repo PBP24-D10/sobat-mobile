@@ -12,6 +12,7 @@ import 'package:sobat_mobile/drug/models/drug_entry.dart';
 import 'package:sobat_mobile/drug/screens/drug_detail.dart';
 import 'package:sobat_mobile/resep/models/resep_model.dart';
 import 'package:sobat_mobile/resep/widgets/list_product.dart';
+import 'package:sobat_mobile/widgets/left_drawer.dart';
 
 class CartList extends StatefulWidget {
   const CartList({Key? key}) : super(key: key);
@@ -23,7 +24,7 @@ class CartList extends StatefulWidget {
 class _ProductListScreenState extends State<CartList> {
   List<Resep> favoriteProducts = [];
   double totalPrice = 0;
-  final String baseUrl = 'http://localhost:8000/media/';
+  final String baseUrl = 'https://m-arvin-sobat.pbp.cs.ui.ac.id8000/media/';
   TextEditingController _newController = new TextEditingController();
   // int totalFavorit = 0;
 
@@ -38,7 +39,8 @@ class _ProductListScreenState extends State<CartList> {
   }
 
   Future<List<Resep>> fetchResep(CookieRequest request) async {
-    final response = await request.get('http://127.0.0.1:8000/resep/json/');
+    final response =
+        await request.get('https://m-arvin-sobat.pbp.cs.ui.ac.id/resep/json/');
     var data = response;
 
     // Melakukan konversi data json menjadi object MoodEntry
@@ -51,8 +53,8 @@ class _ProductListScreenState extends State<CartList> {
         String pk = d['pk'];
         productPKMap[b] = pk;
 
-        final responses =
-            await http.get(Uri.parse('http://127.0.0.1:8000/product/json/$b/'));
+        final responses = await http.get(Uri.parse(
+            'https://m-arvin-sobat.pbp.cs.ui.ac.id/product/json/$b/'));
         var test = jsonDecode(responses.body);
         var fields = test[0]["fields"];
         productDetailsMap[b] = fields;
@@ -66,10 +68,10 @@ class _ProductListScreenState extends State<CartList> {
     return listMood;
   }
 
-
   Future<DrugModel> fetchDrugDetails(String productId) async {
     final response = await http.get(
-      Uri.parse('http://127.0.0.1:8000/product/json/$productId/'),
+      Uri.parse(
+          'https://m-arvin-sobat.pbp.cs.ui.ac.id/product/json/$productId/'),
     );
 
     if (response.statusCode == 200) {
@@ -127,100 +129,99 @@ class _ProductListScreenState extends State<CartList> {
   }
 
   void removeAll(CookieRequest request) async {
-    var url = 'http://127.0.0.1:8000/resep/flutter_clear/';
+    var url = 'https://m-arvin-sobat.pbp.cs.ui.ac.id/resep/flutter_clear/';
     try {
       var response = await request.post(url, {});
 
-      
-        print(response);
-        if (response['success']) {
-          // Jika item dihapus dan tidak ada item lain, mungkin perlu refresh data
-          fetchFuture = fetchResep(request);  // Fetch new data which setState will be called in FutureBuilder
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text("Product Deleted"),
-                content: Text("All product has been removed."),
-                actions: [
-                  TextButton(
-                    child: Text("OK"),
-                    onPressed: () {
-                      Navigator.of(context).pop(); // Close the dialog
-                      setState(() {
-                        totalPrice = 0;
-                      }); // Force rebuild to reflect changes
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-        } 
+      print(response);
+      if (response['success']) {
+        // Jika item dihapus dan tidak ada item lain, mungkin perlu refresh data
+        fetchFuture = fetchResep(
+            request); // Fetch new data which setState will be called in FutureBuilder
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Product Deleted"),
+              content: Text("All product has been removed."),
+              actions: [
+                TextButton(
+                  child: Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog
+                    setState(() {
+                      totalPrice = 0;
+                    }); // Force rebuild to reflect changes
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
     } catch (e) {
       // Handle any errors here
       print(e.toString());
     }
   }
 
-  void updateProduct(String id, String action, int index, int newQuantity, CookieRequest request) async {
-    var url = 'http://127.0.0.1:8000/resep/flutter_update/';
+  void updateProduct(String id, String action, int index, int newQuantity,
+      CookieRequest request) async {
+    var url = 'https://m-arvin-sobat.pbp.cs.ui.ac.id/resep/flutter_update/';
     try {
       var response = await request.post(url, {
         'resep_id': id,
         'action': action,
       });
 
-      
-        print(response);
-        if (response['deleted'] || response['reloaded']) {
-          // Jika item dihapus dan tidak ada item lain, mungkin perlu refresh data
-          fetchFuture = fetchResep(request);  // Fetch new data which setState will be called in FutureBuilder
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text("Product Deleted"),
-                content: Text("The product has been removed."),
-                actions: [
-                  TextButton(
-                    child: Text("OK"),
-                    onPressed: () {
-                      Navigator.of(context).pop(); // Close the dialog
-                      setState(() {
-                        totalPrice = response["total_price"];
-                      }); // Force rebuild to reflect changes
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-        } else {
-          // Tampilkan pemberitahuan atau dialog sesuai dengan hasil
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text("Update Successful"),
-                content: Text("Product amount has been updated."),
-                actions: [
-                  TextButton(
-                    child: Text("OK"),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      setState(() {
-                        totalPrice = response["total_price"];
-                      });
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-        }
-        
-      
+      print(response);
+      if (response['deleted'] || response['reloaded']) {
+        // Jika item dihapus dan tidak ada item lain, mungkin perlu refresh data
+        fetchFuture = fetchResep(
+            request); // Fetch new data which setState will be called in FutureBuilder
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Product Deleted"),
+              content: Text("The product has been removed."),
+              actions: [
+                TextButton(
+                  child: Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog
+                    setState(() {
+                      totalPrice = response["total_price"];
+                    }); // Force rebuild to reflect changes
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        // Tampilkan pemberitahuan atau dialog sesuai dengan hasil
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Update Successful"),
+              content: Text("Product amount has been updated."),
+              actions: [
+                TextButton(
+                  child: Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    setState(() {
+                      totalPrice = response["total_price"];
+                    });
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
     } catch (e) {
       // Handle any errors here
       print(e.toString());
@@ -232,6 +233,7 @@ class _ProductListScreenState extends State<CartList> {
     final request = context.watch<CookieRequest>();
 
     return Scaffold(
+      drawer: LeftDrawer(),
       appBar: AppBar(
         title: const Text("Daftar Resep"),
       ),
@@ -258,7 +260,8 @@ class _ProductListScreenState extends State<CartList> {
             final products = snapshot.data!;
             favoriteProducts = products;
             for (var product in products) {
-              totalPrice += product.fields.amount * productDetailsMap[product.fields.product]["price"];
+              totalPrice += product.fields.amount *
+                  productDetailsMap[product.fields.product]["price"];
             }
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -279,7 +282,6 @@ class _ProductListScreenState extends State<CartList> {
                         String drugCategory =
                             productDetailsMap[productId]["category"];
                         ;
-                        
 
                         return Padding(
                           padding: const EdgeInsets.symmetric(
@@ -293,28 +295,33 @@ class _ProductListScreenState extends State<CartList> {
                             // detailRoute: () => navigateToProductDetail(
                             //     context, productId, productPk, request),
                             quantity: product.fields.amount,
-                            onQuantityChanged: (newQuantity, action) => updateProduct(product.pk, action, index, newQuantity, request),
+                            onQuantityChanged: (newQuantity, action) =>
+                                updateProduct(product.pk, action, index,
+                                    newQuantity, request),
                           ),
                         );
-                        
                       },
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text('Total Price: ${NumberFormat.currency(
-                                    locale: 'id_ID',
-                                    symbol: 'Rp ',
-                                    decimalDigits: 0,
-                                  ).format(totalPrice)}'),
+                      locale: 'id_ID',
+                      symbol: 'Rp ',
+                      decimalDigits: 0,
+                    ).format(totalPrice)}'),
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      _showConfirmationDialog(context, products, totalPrice, request);
+                      _showConfirmationDialog(
+                          context, products, totalPrice, request);
                     },
-                    child: Text('Checkout', style: TextStyle(color: const Color.fromARGB(255, 211, 239, 211))),
+                    child: Text('Checkout',
+                        style: TextStyle(
+                            color: const Color.fromARGB(255, 211, 239, 211))),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green, // Set the background color to green
+                      backgroundColor:
+                          Colors.green, // Set the background color to green
                     ),
                   ),
                 ],
@@ -325,69 +332,82 @@ class _ProductListScreenState extends State<CartList> {
       ),
     );
   }
-  void _showConfirmationDialog(BuildContext context, List<Resep> products, double totalPrice, CookieRequest request) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Row(
-          children: [
-            Icon(Icons.info, color: Colors.blue),
-            SizedBox(width: 8),
-            Text('Purchase Summary'),
-          ],
-        ),
-        content: SingleChildScrollView( // Added to handle overflow when list is long
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+
+  void _showConfirmationDialog(BuildContext context, List<Resep> products,
+      double totalPrice, CookieRequest request) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
             children: [
-              ...products.map((product) {
-                return ListTile(
-                  leading: Image.network(baseUrl + productDetailsMap[product.fields.product]["image"], width: 50),
-                  title: Text(productDetailsMap[product.fields.product]["name"]),
-                  subtitle: Text(
-                      'Jumlah: ${product.fields.amount} - Total: ${NumberFormat.currency(
-                                    locale: 'id_ID',
-                                    symbol: 'Rp ',
-                                    decimalDigits: 0,
-                                  ).format(product.fields.amount * productDetailsMap[product.fields.product]["price"])}'),
-                );
-              }).toList(),
-              SizedBox(height: 16),
-              Text(
-                'Total Price: ${NumberFormat.currency(
-                                    locale: 'id_ID',
-                                    symbol: 'Rp ',
-                                    decimalDigits: 0,
-                                  ).format(totalPrice)}', // Ensures the price is formatted correctly
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
+              Icon(Icons.info, color: Colors.blue),
+              SizedBox(width: 8),
+              Text('Purchase Summary'),
             ],
           ),
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              removeAll(request);
-            },
-            child: Text('Remove all medications', style: TextStyle(color: const Color.fromARGB(255, 252, 225, 223))),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red, // Set the background color to green
+          content: SingleChildScrollView(
+            // Added to handle overflow when list is long
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ...products.map((product) {
+                  return ListTile(
+                    leading: Image.network(
+                        baseUrl +
+                            productDetailsMap[product.fields.product]["image"],
+                        width: 50),
+                    title:
+                        Text(productDetailsMap[product.fields.product]["name"]),
+                    subtitle: Text(
+                        'Jumlah: ${product.fields.amount} - Total: ${NumberFormat.currency(
+                      locale: 'id_ID',
+                      symbol: 'Rp ',
+                      decimalDigits: 0,
+                    ).format(product.fields.amount * productDetailsMap[product.fields.product]["price"])}'),
+                  );
+                }).toList(),
+                SizedBox(height: 16),
+                Text(
+                  'Total Price: ${NumberFormat.currency(
+                    locale: 'id_ID',
+                    symbol: 'Rp ',
+                    decimalDigits: 0,
+                  ).format(totalPrice)}', // Ensures the price is formatted correctly
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text('Back to prescription', style: TextStyle(color: const Color.fromARGB(255, 211, 239, 211))),
-            style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green, // Set the background color to green
-                    ),
-          ),
-        ],
-      );
-    },
-  );
-}
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                removeAll(request);
+              },
+              child: Text('Remove all medications',
+                  style: TextStyle(
+                      color: const Color.fromARGB(255, 252, 225, 223))),
+              style: ElevatedButton.styleFrom(
+                backgroundColor:
+                    Colors.red, // Set the background color to green
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Back to prescription',
+                  style: TextStyle(
+                      color: const Color.fromARGB(255, 211, 239, 211))),
+              style: ElevatedButton.styleFrom(
+                backgroundColor:
+                    Colors.green, // Set the background color to green
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

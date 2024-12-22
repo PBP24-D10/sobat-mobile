@@ -28,12 +28,12 @@ class detailPage extends StatefulWidget {
 
 Future<void> editFavorite(
     String favoriteId, String newNote, CookieRequest request) async {
-  // final response = await request.get('http://127.0.0.1:8000/favorite/api/edit/$favoriteId/');
-  final url = 'http://127.0.0.1:8000/favorite/api/edit/$favoriteId/';
+  final url =
+      'https://m-arvin-sobat.pbp.cs.ui.ac.id/favorite/api/edit/$favoriteId/';
   if (newNote.isNotEmpty) {
     try {
       final response = await request.post(
-          'http://127.0.0.1:8000/favorite/api/edit/$favoriteId/',
+          'https://m-arvin-sobat.pbp.cs.ui.ac.id/favorite/api/edit/$favoriteId/',
           {"catatan": newNote});
     } catch (e) {
       print("Request failed: $e");
@@ -46,7 +46,7 @@ TextEditingController test = TextEditingController();
 class _detailPageState extends State<detailPage> {
   Future<void> fetchFavoriteNote() async {
     final url =
-        'http://127.0.0.1:8000/favorite/favorites/json/'; // Adjust the URL if needed
+        'https://m-arvin-sobat.pbp.cs.ui.ac.id/favorite/favorites/json/'; // Adjust the URL if needed
     final response = await widget.request.get(url);
     var data = response;
 
@@ -74,7 +74,7 @@ class _detailPageState extends State<detailPage> {
   }
 
   // Define the base URL
-  final String baseUrl = 'http://localhost:8000/media/';
+  final String baseUrl = 'https://m-arvin-sobat.pbp.cs.ui.ac.id/media/';
 
   @override
   Widget build(BuildContext context) {

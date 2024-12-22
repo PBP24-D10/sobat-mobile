@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Sobat',
         theme: ThemeData(
-        primaryColor: AppColors.primary,
+          primaryColor: AppColors.primary,
           colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
           useMaterial3: true,
         ),

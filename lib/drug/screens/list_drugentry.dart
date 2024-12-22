@@ -8,6 +8,7 @@ import 'package:sobat_mobile/drug/screens/drug_detail.dart';
 import 'package:sobat_mobile/drug/screens/drugedit_form.dart';
 import 'package:sobat_mobile/drug/screens/drugentry_form.dart';
 import 'package:http/http.dart' as http;
+import 'package:sobat_mobile/widgets/left_drawer.dart';
 
 class DrugEntryPage extends StatefulWidget {
   const DrugEntryPage({super.key});
@@ -17,11 +18,12 @@ class DrugEntryPage extends StatefulWidget {
 }
 
 class _DrugEntryPageState extends State<DrugEntryPage> {
-  // Definisikan base URL sekali
-  final String baseUrl = 'http://127.0.0.1:8000/media/'; // Sesuaikan dengan emulator atau perangkat
+  // Define the base URL for images
+  final String baseUrl = 'https://m-arvin-sobat.pbp.cs.ui.ac.id/media/';
 
   Future<List<DrugModel>> fetchProductEntries(CookieRequest request) async {
-    final response = await request.get('http://127.0.0.1:8000/product/json/');
+    final response = await request
+        .get('https://m-arvin-sobat.pbp.cs.ui.ac.id/product/json/');
     var data = response;
 
     List<DrugModel> listProduct = [];
@@ -50,7 +52,7 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
   Future<void> addToResep(String productId, CookieRequest request) async {
     try {
       final response = await request.post(
-        'http://127.0.0.1:8000/resep/flutter_add/$productId/',
+        'https://m-arvin-sobat.pbp.cs.ui.ac.id/resep/flutter_add/$productId/',
         {},
       );
 
@@ -86,7 +88,7 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
   Future<void> addToFavorite(String productId, CookieRequest request) async {
     try {
       final response = await request.post(
-        'http://127.0.0.1:8000/favorite/api/add/$productId/',
+        'https://m-arvin-sobat.pbp.cs.ui.ac.id/favorite/api/add/$productId/',
         {},
       );
 
@@ -120,7 +122,8 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
   }
 
   Future<bool> deleteProduct(String productId) async {
-    final url = 'http://127.0.0.1:8000/product/delete-drug/$productId/';
+    final url =
+        'https://m-arvin-sobat.pbp.cs.ui.ac.id/product/delete-drug/$productId/';
     final response = await http.get(Uri.parse(url));
 
     return response.statusCode == 200;
@@ -130,6 +133,7 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
     return Scaffold(
+      drawer: LeftDrawer(),
       appBar: AppBar(
         title: const Text('Product Entry List'),
       ),

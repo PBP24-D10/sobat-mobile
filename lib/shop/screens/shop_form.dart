@@ -38,7 +38,8 @@ class _ShopFormPageState extends State<ShopFormPage> {
     super.dispose();
   }
 
-  Future<void> _selectTime(BuildContext context, TextEditingController controller) async {
+  Future<void> _selectTime(
+      BuildContext context, TextEditingController controller) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
@@ -71,7 +72,8 @@ class _ShopFormPageState extends State<ShopFormPage> {
   }
 
   Future<File?> _pickImageNonWeb() async {
-    final pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedImage =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedImage != null) {
       return File(pickedImage.path);
     }
@@ -134,7 +136,9 @@ class _ShopFormPageState extends State<ShopFormPage> {
 
       if (response['status'] == 'success') {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Shop "${_nameController.text}" created successfully!')),
+          SnackBar(
+              content:
+                  Text('Shop "${_nameController.text}" created successfully!')),
         );
         Navigator.pushReplacement(
           context,
@@ -142,7 +146,8 @@ class _ShopFormPageState extends State<ShopFormPage> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to create shop: ${response['message']}')),
+          SnackBar(
+              content: Text('Failed to create shop: ${response['message']}')),
         );
       }
     } catch (e) {
@@ -189,7 +194,8 @@ class _ShopFormPageState extends State<ShopFormPage> {
                   labelText: 'Shop Name',
                   border: OutlineInputBorder(),
                 ),
-                validator: (value) => value!.isEmpty ? 'Please enter a shop name' : null,
+                validator: (value) =>
+                    value!.isEmpty ? 'Please enter a shop name' : null,
               ),
               const SizedBox(height: 15),
               TextFormField(
@@ -198,7 +204,8 @@ class _ShopFormPageState extends State<ShopFormPage> {
                   labelText: 'Shop Address',
                   border: OutlineInputBorder(),
                 ),
-                validator: (value) => value!.isEmpty ? 'Please enter a shop address' : null,
+                validator: (value) =>
+                    value!.isEmpty ? 'Please enter a shop address' : null,
               ),
               const SizedBox(height: 15),
               GestureDetector(

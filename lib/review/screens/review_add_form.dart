@@ -97,12 +97,13 @@ class _ReviewFormPageState extends State<ReviewFormPage> {
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         final response = await request.postJson(
-                          "http://m-arvin-sobat.pbp.cs.ui.ac.id/review/${widget.productID}/create-flutter/",
+                          "https://m-arvin-sobat.pbp.cs.ui.ac.id/review/${widget.productID}/create-flutter/",
                           jsonEncode(<String, dynamic>{
                             'rating': _rating,
                             'comment': _comment,
                           }),
                         );
+                        print(widget.productID);
                         if (context.mounted) {
                           if (response['status'] == 'success') {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -114,7 +115,8 @@ class _ReviewFormPageState extends State<ReviewFormPage> {
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text("An error occurred. Please try again."),
+                                content: Text(
+                                    "An error occurred. Please try again."),
                               ),
                             );
                           }
@@ -124,7 +126,8 @@ class _ReviewFormPageState extends State<ReviewFormPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
                     ),
                     child: const Text(
                       "Save",
