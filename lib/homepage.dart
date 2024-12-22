@@ -40,6 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
           spacing: 10, // Menambahkan jarak antar ikon
           alignment: WrapAlignment.center,
           children: [
+            Text("SOBAT"),
             // IconButton(
             //   icon: Icon(Icons.logout),
             // onPressed: () async {
@@ -106,7 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
               SizedBox(
-                height: 15,
+                height: 25,
               ),
               // SizedBox(
               //   height: 100,
