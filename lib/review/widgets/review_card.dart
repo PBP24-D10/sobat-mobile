@@ -100,7 +100,7 @@ class ReviewTile extends StatelessWidget {
                       );
                       if (confirmDelete == true) {
                         final response = await request.post(
-                          "http://127.0.0.1:8000/review/${item.product}/${item.id}/delete-flutter/",
+                          "http://m-arvin-sobat.pbp.cs.ui.ac.id/review/${item.product}/${item.id}/delete-flutter/",
                           {},
                         );
                         if (context.mounted) {
