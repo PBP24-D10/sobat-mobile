@@ -102,6 +102,9 @@ class _EditReviewPageState extends State<EditReviewPage> {
                     }
                     return null;
                   },
+                  keyboardType: TextInputType.multiline,
+                  minLines: 3,
+                  maxLines: null,
                 ),
               ),
               Align(
@@ -136,6 +139,11 @@ class _EditReviewPageState extends State<EditReviewPage> {
                         }
                       }
                     },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black, 
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    ),
                     child: const Text(
                       "Update",
                       style: TextStyle(color: Colors.white),
