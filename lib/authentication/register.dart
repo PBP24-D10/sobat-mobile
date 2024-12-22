@@ -154,14 +154,16 @@ class _RegisterPageState extends State<RegisterPage> {
                   }
 
                   final response = await request.postJson(
-                      "https://m-arvin-sobat.pbp.cs.ui.ac.id/register_mobile/",
-                      jsonEncode({
-                        "nama": nama,
-                        "username": username,
-                        "password1": password1,
-                        "password2": password2,
-                        "role": role,
-                      }));
+                    "http://10.0.2.2:8000/register_mobile/",  // Updated URL for Android emulator
+                    jsonEncode({
+                      "nama": _namaController.text,
+                      "username": _usernameController.text,
+                      "password1": _passwordController.text,
+                      "password2": _confirmPasswordController.text,
+                      "role": _selectedRole,
+                    }),
+                  );
+
                   if (context.mounted) {
                     if (response['status'] == 'success') {
                       ScaffoldMessenger.of(context).showSnackBar(

@@ -109,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
 
                       // Cek kredensial
                       final response = await request
-                          .login("https://m-arvin-sobat.pbp.cs.ui.ac.id/login_mobile/", {
+                          .login("https://localhost:8000/login_mobile/", {
                         'username': username,
                         'password': password,
                       });
