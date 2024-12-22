@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:quickalert/quickalert.dart';
 import 'package:sobat_mobile/drug/models/drug_entry.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
@@ -23,6 +26,7 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
       if (d != null) {
         try {
           final entry = DrugModel.fromJson(d);
+
           listProduct.add(entry);
         } catch (e) {
           // Handle any error during data parsing
@@ -32,6 +36,58 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
     return listProduct;
   }
 
+  void showSucces(String productId, CookieRequest request) {
+    QuickAlert.show(
+      context: context,
+      type: QuickAlertType.success,
+      onConfirmBtnTap: () => addToFavorite(productId, request),
+    );
+  }
+
+  Future<void> addToFavorite(String productId, CookieRequest request) async {
+    try {
+      // Kirim permintaan POST ke endpoint favorit
+      final response = await request
+          .post('http://127.0.0.1:8000/favorite/api/add/$productId/', {});
+      // headers: {
+      //   'Content-Type': 'application/json',
+      //   // 'X-CSRFToken': csrfToken, // Menambahkan CSRF token
+      // },
+
+      if (response['status'] == 'success') {
+        // Jika berhasil, tampilkan dialog sukses
+        QuickAlert.show(
+            context: context,
+            type: QuickAlertType.success,
+            title: 'Berhasil!',
+            text: 'Produk berhasil ditambahkan ke favorit.',
+            autoCloseDuration: Duration(seconds: 1),
+            disableBackBtn: true,
+            showConfirmBtn: false);
+
+        print('Produk berhasil ditambahkan ke favorit!');
+        // Menampilkan pesan atau memperbarui UI sesuai respons
+      } else {
+        QuickAlert.show(
+          context: context,
+          type: QuickAlertType.error,
+          title: 'Gagal!',
+          text: 'Produk sudah ada di favorit.',
+          confirmBtnText: 'Kembali',
+          onConfirmBtnTap: () {
+            Navigator.pop(context); // Menutup dialog
+          },
+        );
+      }
+      // else {
+      //   print(
+      //       'Gagal menambahkan produk ke favorit. Status: ${response.statusCode}');
+      //   // Tampilkan pesan error
+      // }
+    } catch (error) {
+      print('Terjadi kesalahan: $error');
+    }
+  }
   // Future<bool> deleteProduct(CookieRequest request, String productId) async {
   //   final response = await request.delete('http://localhost:8000/product/delete/$productId/');
   //   if (response.statusCode == 200) {
@@ -47,7 +103,6 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
 
     return response.statusCode == 200;
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -80,18 +135,24 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
                 itemCount: snapshot.data!.length,
                 itemBuilder: (_, index) {
                   final product = snapshot.data![index];
+
                   return InkWell(
                     onTap: () {
                       // Navigasi ke halaman detail produk
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ProductDetailPage(product: product),
+                          builder: (context) => ProductDetailPage(
+                            product: product.fields,
+                            detailRoute: () =>
+                                addToFavorite(product.pk, request),
+                          ),
                         ),
                       );
                     },
                     child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
                       padding: const EdgeInsets.all(20.0),
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -128,27 +189,31 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
                                 onPressed: () {
                                   // Navigate to edit form, passing the selected product
                                   // Navigator.push(
-                                    // context,
-                                    // MaterialPageRoute(
-                                    //   builder: (context) => DrugEntryForm(product: product),
-                                    // ),
+                                  // context,
+                                  // MaterialPageRoute(
+                                  //   builder: (context) => DrugEntryForm(product: product),
+                                  // ),
                                   // );
                                 },
                               ),
                               IconButton(
                                 icon: Icon(Icons.delete, color: Colors.red),
                                 onPressed: () async {
-                                  bool success = await deleteProduct(product.pk.toString());
-                                    if (success) {
-                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                        content: Text('Product successfully deleted'),
-                                      ));
-                                      // Optionally refresh the list or navigate away
-                                    } else {
-                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                        content: Text('Failed to delete product'),
-                                      ));
-                                    }
+                                  bool success = await deleteProduct(
+                                      product.pk.toString());
+                                  if (success) {
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(SnackBar(
+                                      content:
+                                          Text('Product successfully deleted'),
+                                    ));
+                                    // Optionally refresh the list or navigate away
+                                  } else {
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(SnackBar(
+                                      content: Text('Failed to delete product'),
+                                    ));
+                                  }
                                 },
                                 // child: Text('Delete Product'),
                               ),
@@ -169,7 +234,9 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddDrugForm()), // Navigate to the add drug form
+            MaterialPageRoute(
+                builder: (context) =>
+                    AddDrugForm()), // Navigate to the add drug form
           );
         },
         child: const Icon(Icons.add),

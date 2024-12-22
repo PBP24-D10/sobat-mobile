@@ -7,6 +7,9 @@ import 'package:sobat_mobile/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:sobat_mobile/authentication/login.dart';
+import 'package:sobat_mobile/widgets/shop_container.dart';
+import 'package:sobat_mobile/widgets/tagline.dart';
+import 'package:sobat_mobile/widgets/widget_custom.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -34,7 +37,7 @@ class _MyHomePageState extends State<MyHomePage> {
           padding: EdgeInsets.all(1),
           margin: EdgeInsets.symmetric(horizontal: 30, vertical: 30),
           decoration: BoxDecoration(
-              color: Colors.green[900]?.withOpacity(0.8),
+              color: Colors.white,
               borderRadius: BorderRadius.all(
                 Radius.circular(
                   24,
@@ -48,25 +51,33 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 4),
             child: GNav(
-              tabBackgroundColor: Colors.white70,
+              tabBackgroundColor: Colors.green.shade900,
               tabBorderRadius: 30,
               iconSize: 20,
               gap: 5,
               tabs: [
                 GButton(
+                  iconActiveColor: Colors.white,
+                  iconColor: Colors.black,
                   icon: FontAwesomeIcons.house,
                   onPressed: () {},
                 ),
                 GButton(
+                  iconActiveColor: Colors.white,
+                  iconColor: Colors.black,
                   icon: FontAwesomeIcons.prescriptionBottleMedical,
                   onPressed: () {},
                 ),
                 GButton(
+                  iconActiveColor: Colors.white,
+                  iconColor: Colors.black,
                   icon: FontAwesomeIcons.shop,
                   onPressed: () {},
                 ),
                 GButton(
                   icon: FontAwesomeIcons.rightFromBracket,
+                  iconActiveColor: Colors.white,
+                  iconColor: Colors.black,
                   onPressed: () async {
                     final response = await request
                         .logout("http://127.0.0.1:8000/logout_mobile/");
@@ -128,11 +139,46 @@ class _MyHomePageState extends State<MyHomePage> {
             //     }
             //   }
             // },
-            // )
+            // ),
           ],
         ),
       ),
       drawer: LeftDrawer(),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(14.0),
+          child: Column(
+            children: [
+              SizedBox(
+                height: 100,
+                child: ListView(
+                  shrinkWrap: true,
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    cart(),
+                    cart(),
+                    cart(),
+                    cart(),
+                    cart(),
+                    cart(),
+                    cart(),
+                    cart(),
+                    cart(),
+                  ],
+                ),
+              ),
+              tagline(),
+              SizedBox(
+                height: 20,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [WidgetCustom(), WidgetCustom()],
+              )
+            ],
+          ),
+        ),
+      ),
       // body:
       // SingleChildScrollView(child:
       // Center(

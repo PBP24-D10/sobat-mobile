@@ -108,20 +108,16 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 24.0),
                   ElevatedButton(
                     onPressed: () async {
-                      String nama = _namaController.text;
                       String username = _usernameController.text;
                       String password = _passwordController.text;
-                      String role = _roleController.text;
 
                       // Cek kredensial
                       // Untuk menyambungkan Android emulator dengan Django pada localhost,
                       // gunakan URL http://10.0.2.2/
                       final response = await request
-                          .login("http://127.0.0.1:8000//login_mobile/", {
-                        'nama': nama,
+                          .login("http://127.0.0.1:8000/login_mobile/", {
                         'username': username,
                         'password': password,
-                        'role': role,
                       });
 
                       if (request.loggedIn) {
@@ -131,8 +127,28 @@ class _LoginPageState extends State<LoginPage> {
                         if (context.mounted) {
                           Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(
-                                builder: (context) => const MyHomePage()),
+                            PageRouteBuilder(
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) =>
+                                      const MyHomePage(),
+                              transitionsBuilder: (context, animation,
+                                  secondaryAnimation, child) {
+                                const begin = Offset(
+                                    1.0, 0.0); // Halaman masuk dari kanan
+                                const end = Offset
+                                    .zero; // Halaman berhenti di posisi normal
+                                const curve = Curves.easeInOut;
+
+                                var tween = Tween(begin: begin, end: end)
+                                    .chain(CurveTween(curve: curve));
+                                var offsetAnimation = animation.drive(tween);
+
+                                return SlideTransition(
+                                  position: offsetAnimation,
+                                  child: child,
+                                );
+                              },
+                            ),
                           );
                           ScaffoldMessenger.of(context)
                             ..hideCurrentSnackBar()

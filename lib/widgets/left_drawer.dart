@@ -76,14 +76,13 @@ class LeftDrawer extends StatelessWidget {
               );
             },
           ),
-                    ListTile(
+          ListTile(
             leading: const Icon(FontAwesomeIcons.comments),
             title: const Text('Forum'),
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (context) => const ForumPage()),
+                MaterialPageRoute(builder: (context) => const ForumPage()),
               );
             },
           ),
@@ -100,7 +99,7 @@ class LeftDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(FontAwesomeIcons.cartShopping),
-            title: const Text('Daftar Favorite'),
+            title: const Text('Cart'),
             onTap: () {
               Navigator.push(
                 context,
