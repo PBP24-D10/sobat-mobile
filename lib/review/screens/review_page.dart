@@ -10,7 +10,7 @@ class ReviewPage extends StatefulWidget {
   final String productPrice;
   final String productID;
   final String image;
-  final String baseUrl = 'http://localhost:8000/media/';
+  final String baseUrl = 'http://m-arvin-sobat.pbp.cs.ui.ac.id/media/';
 
   const ReviewPage({
     super.key,
@@ -27,7 +27,7 @@ class ReviewPage extends StatefulWidget {
 class _ReviewPageState extends State<ReviewPage> {
   Future<List<Review>> fetchReviews(CookieRequest request) async {
     var id = widget.productID;
-    final response = await request.get('http://localhost:8000/review/$id/json/');
+    final response = await request.get('http://m-arvin-sobat.pbp.cs.ui.ac.id/review/$id/json/');
     var data = response;
     List<Review> reviewList = [];
     for (var d in data) {
@@ -159,6 +159,12 @@ class _ReviewPageState extends State<ReviewPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Center( child: Image.network(imageUrl, fit: BoxFit.cover,
+                  width: MediaQuery.of(context).size.width - 32,
+                  height: 200,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Text('Unable to load image', textAlign: TextAlign.center);
+                  })),
                   Center(
                     child: Column(
                       children: [

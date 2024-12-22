@@ -13,7 +13,7 @@ class ReviewTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final request = context.read<CookieRequest>();
-    String nama = request.jsonData['username'];
+    int userID = request.jsonData['id'];
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -44,7 +44,7 @@ class ReviewTile extends StatelessWidget {
               style: const TextStyle(color: Color.fromARGB(255, 127, 127, 127)),
             ),
             const SizedBox(height: 16),
-            if (nama == item.username)
+            if (userID == item.user)
               Row(
                 children: [
                   ElevatedButton(
@@ -76,14 +76,16 @@ class ReviewTile extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.red),
                     onPressed: () async {
                       // Show confirmation dialog
                       bool? confirmDelete = await showDialog<bool>(
                         context: context,
                         builder: (context) => AlertDialog(
                           title: const Text("Confirm Delete"),
-                          content: const Text("Are you sure you want to delete this review?"),
+                          content: const Text(
+                              "Are you sure you want to delete this review?"),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(context, false),
@@ -98,7 +100,7 @@ class ReviewTile extends StatelessWidget {
                       );
                       if (confirmDelete == true) {
                         final response = await request.post(
-                          "http://127.0.0.1:8000/review/${item.product}/${item.id}/delete-flutter/",
+                          "http://m-arvin-sobat.pbp.cs.ui.ac.id/review/${item.product}/${item.id}/delete-flutter/",
                           {},
                         );
                         if (context.mounted) {
@@ -112,7 +114,8 @@ class ReviewTile extends StatelessWidget {
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text("Failed to delete review. Please try again."),
+                                content: Text(
+                                    "Failed to delete review. Please try again."),
                               ),
                             );
                           }
