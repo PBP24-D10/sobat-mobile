@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:sobat_mobile/authentication/register.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginApp extends StatelessWidget {
   const LoginApp({super.key});
@@ -69,7 +70,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
+                  SizedBox(
                     height: 200,
                     child: Image.asset("assets/login.png"),
                   ),
@@ -107,10 +108,8 @@ class _LoginPageState extends State<LoginPage> {
                       String password = _passwordController.text;
 
                       // Cek kredensial
-                      // Untuk menyambungkan Android emulator dengan Django pada localhost,
-                      // gunakan URL http://10.0.2.2/
                       final response = await request
-                          .login("https://m-arvin-sobat.pbp.cs.ui.ac.id/login_mobile/", {
+                          .login("https://localhost:8000/login_mobile/", {
                         'username': username,
                         'password': password,
                       });
@@ -118,6 +117,11 @@ class _LoginPageState extends State<LoginPage> {
                       if (request.loggedIn) {
                         String message = response['message'];
                         String uname = response['username'];
+                        int userId = response['user_id']; // Ambil user_id dari respons
+
+                        // Simpan user_id ke SharedPreferences
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.setInt('user_id', userId);
 
                         if (context.mounted) {
                           Navigator.pushReplacement(
@@ -148,9 +152,7 @@ class _LoginPageState extends State<LoginPage> {
                           ScaffoldMessenger.of(context)
                             ..hideCurrentSnackBar()
                             ..showSnackBar(
-                              SnackBar(
-                                  content:
-                                      Text("$message Selamat datang, $uname.")),
+                              SnackBar(content: Text("$message Selamat datang, $uname.")),
                             );
                         }
                       } else {
@@ -173,6 +175,7 @@ class _LoginPageState extends State<LoginPage> {
                         }
                       }
                     },
+
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
                       minimumSize: Size(double.infinity, 50),
