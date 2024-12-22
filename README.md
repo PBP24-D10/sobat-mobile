@@ -157,3 +157,5 @@ Setelah memproses request, Django akan membuat response dalam format tertentu, s
 
 Flutter menerima data dari Django melalui response tersebut. Data ini kemudian digunakan oleh Flutter untuk memperbarui tampilan aplikasi atau melakukan logika lainnya.
 
+LINK DEPLOYMENT APLIKASI: ristek.link/pbpd10sobatmobile
+
