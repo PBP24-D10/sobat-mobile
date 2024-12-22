@@ -26,7 +26,7 @@ class _AnswersPageState extends State<AnswersPage> {
   String _drugAns = "-1";
   DrugModel? _selectedDrug;
   final TextEditingController _answer = TextEditingController();
-  final String baseUrl = 'http://127.0.0.1:8000/media/';
+  final String baseUrl = 'https://m-arvin-sobat.pbp.cs.ui.ac.id/media/';
 
   final Color primaryGreen = AppColors.primary;
   final Color secondaryGreen = AppColors.secondary;
@@ -36,7 +36,7 @@ class _AnswersPageState extends State<AnswersPage> {
     String questionId = widget.question.pk;
 
     final response = await request
-        .get('http://127.0.0.1:8000/forum/show_json_answer/$questionId/');
+        .get('https://m-arvin-sobat.pbp.cs.ui.ac.id/forum/show_json_answer/$questionId/');
 
     List<Answer> listAnswer = [];
     for (var d in response) {
@@ -61,12 +61,12 @@ class _AnswersPageState extends State<AnswersPage> {
   Future<DrugModel> fetchProductbyId(
       CookieRequest request, String productId) async {
     final response =
-        await request.get('http://127.0.0.1:8000/product/json/$productId/');
+        await request.get('https://m-arvin-sobat.pbp.cs.ui.ac.id/product/json/$productId/');
     return DrugModel.fromJson(response[0]);
   }
 
   Future<List<DrugModel>> fetchProductEntries(CookieRequest request) async {
-    final response = await request.get('http://127.0.0.1:8000/product/json/');
+    final response = await request.get('https://m-arvin-sobat.pbp.cs.ui.ac.id/product/json/');
     List<DrugModel> listProduct = [];
     for (var d in response) {
       if (d != null) {
@@ -79,7 +79,7 @@ class _AnswersPageState extends State<AnswersPage> {
   Future<void> handleLike(
       CookieRequest request, Answer answer, int userId) async {
     final response = await request
-        .post('http://127.0.0.1:8000/forum/like_answer/${answer.pk}/', {});
+        .post('https://m-arvin-sobat.pbp.cs.ui.ac.id/like_answer/${answer.pk}/', {});
 
     if (response['status'] == 'success') {
       setState(() {
@@ -100,7 +100,7 @@ class _AnswersPageState extends State<AnswersPage> {
   Future<void> handleDelete(CookieRequest request, Answer answer) async {
     try {
       final response = await request.post(
-          'http://127.0.0.1:8000/forum/delete_answer_flutter/${answer.pk}/',
+          'https://m-arvin-sobat.pbp.cs.ui.ac.id/delete_answer_flutter/${answer.pk}/',
           {});
 
       if (response['status'] == 'success') {
