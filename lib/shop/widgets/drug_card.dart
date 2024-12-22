@@ -45,8 +45,8 @@ class DrugCard extends StatelessWidget {
                 builder: (context) => ProductDetailPage(
                   product: drug,
                   detailRoute: () {
-                    // Implement custom functionality here
-                  },
+                    // Optional custom action
+                  }, onPressed: () {  },
                 ),
                 settings: RouteSettings(arguments: {'pk': drug.pk}),
               ),
