@@ -73,8 +73,8 @@ class _bottomNavigationBarState extends State<bottomNavigationBar> {
                 iconActiveColor: Colors.white,
                 iconColor: Colors.black,
                 onPressed: () async {
-                  final response = await widget.request
-                      .logout("http://127.0.0.1:8000/logout_mobile/");
+                  final response = await widget.request.logout(
+                      "https://m-arvin-sobat.pbp.cs.ui.ac.id/logout_mobile/");
                   String message = response["message"];
                   if (context.mounted) {
                     if (response['status']) {

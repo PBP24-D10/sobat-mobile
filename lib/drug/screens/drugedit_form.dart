@@ -28,7 +28,8 @@ class _EditDrugFormState extends State<EditDrugForm> {
   String? _imageName;
   bool _isLoading = true; // To handle loading state
   String? existingImageUrl;
-  final String baseUrl = 'http://127.0.0.1:8000/media/'; // Adjust if needed
+  final String baseUrl =
+      'https://m-arvin-sobat.pbp.cs.ui.ac.id/media/'; // Adjust if needed
 
   @override
   void initState() {
@@ -39,9 +40,10 @@ class _EditDrugFormState extends State<EditDrugForm> {
   Future<void> fetchExistingData() async {
     try {
       final response = await http.get(Uri.parse(
-          'http://127.0.0.1:8000/product/json/${widget.productId}/')); // Adjust endpoint
+          'https://m-arvin-sobat.pbp.cs.ui.ac.id/product/json/${widget.productId}/')); // Adjust endpoint
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body); // Ensure jsonDecode is available
+        final data =
+            jsonDecode(response.body); // Ensure jsonDecode is available
         setState(() {
           nameController.text = data['fields']['name'];
           descController.text = data['fields']['desc'];
@@ -97,7 +99,7 @@ class _EditDrugFormState extends State<EditDrugForm> {
   Future<void> submitEdit() async {
     if (_formKey.currentState!.validate()) {
       var uri = Uri.parse(
-          'http://127.0.0.1:8000/product/edit-drug-ajax/${widget.productId}/');
+          'https://m-arvin-sobat.pbp.cs.ui.ac.id/edit-drug-ajax/${widget.productId}/');
       var request = http.MultipartRequest('POST', uri)
         ..fields['name'] = nameController.text
         ..fields['desc'] = descController.text
@@ -107,8 +109,7 @@ class _EditDrugFormState extends State<EditDrugForm> {
         ..fields['price'] = priceController.text;
 
       if (_image != null && _imageName != null) {
-        request.files.add(http.MultipartFile.fromBytes(
-            'image', _image!,
+        request.files.add(http.MultipartFile.fromBytes('image', _image!,
             filename: _imageName));
       }
 

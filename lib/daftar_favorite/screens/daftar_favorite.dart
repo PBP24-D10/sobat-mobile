@@ -11,6 +11,7 @@ import 'package:sobat_mobile/daftar_favorite/screens/detail.dart';
 import 'package:sobat_mobile/daftar_favorite/widgets/list_product.dart';
 import 'package:sobat_mobile/drug/models/drug_entry.dart';
 import 'package:sobat_mobile/drug/screens/drug_detail.dart';
+import 'package:sobat_mobile/widgets/left_drawer.dart';
 
 class ProductListScreen extends StatefulWidget {
   const ProductListScreen({Key? key}) : super(key: key);
@@ -21,7 +22,7 @@ class ProductListScreen extends StatefulWidget {
 
 class _ProductListScreenState extends State<ProductListScreen> {
   List<FavoriteEntry> favoriteProducts = [];
-  final String baseUrl = 'http://localhost:8000/media/';
+  final String baseUrl = 'https://m-arvin-sobat.pbp.cs.ui.ac.id/media/';
   TextEditingController _newController = new TextEditingController();
   // int totalFavorit = 0;
 
@@ -36,7 +37,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
   }
 
   Future<List<FavoriteEntry>> fetchProduct(CookieRequest request) async {
-    final response = await request.get('http://127.0.0.1:8000/favorite/json/');
+    final response = await request
+        .get('https://m-arvin-sobat.pbp.cs.ui.ac.id/favorite/json/');
     var data = response;
 
     // Melakukan konversi data json menjadi object MoodEntry
@@ -49,8 +51,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
         String pk = d['pk'];
         productPKMap[b] = pk;
 
-        final responses =
-            await http.get(Uri.parse('http://127.0.0.1:8000/product/json/$b/'));
+        final responses = await http.get(Uri.parse(
+            'https://m-arvin-sobat.pbp.cs.ui.ac.id/product/json/$b/'));
         var test = jsonDecode(responses.body);
         var fields = test[0]["fields"];
         productDetailsMap[b] = fields;
@@ -67,7 +69,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Future<void> editFavorite(
       String favoriteId, String newNote, CookieRequest request) async {
     // final response = await request.get('http://127.0.0.1:8000/favorite/api/edit/$favoriteId/');
-    final url = await request.get('http://127.0.0.1:8000/favorite/json/');
+    final url = await request
+        .get('https://m-arvin-sobat.pbp.cs.ui.ac.id/favorite/json/');
     var data = url;
 
     try {
@@ -84,7 +87,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
   Future<DrugModel> fetchDrugDetails(String productId) async {
     final response = await http.get(
-      Uri.parse('http://127.0.0.1:8000/product/json/$productId/'),
+      Uri.parse(
+          'https://m-arvin-sobat.pbp.cs.ui.ac.id/product/json/$productId/'),
     );
 
     if (response.statusCode == 200) {
@@ -111,7 +115,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
         MaterialPageRoute(
           builder: (context) => detailPage(
             product: product.fields,
-            addCart: ()=> addToResep(productId, request),
+            addCart: () => addToResep(productId, request),
             // detailRoute: () => deleteProduct(productPk),
             detailRoute: () => showConfirm(productPk, true),
             pk: productPk,
@@ -125,8 +129,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
       );
     }
   }
-
-
 
   void showConfirm(String productId, bool isInProduct) {
     setState(() {
@@ -148,7 +150,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
     try {
       // Send POST request to favorite endpoint
       final response = await request.post(
-        'http://127.0.0.1:8000/resep/flutter_add/$productId/',
+        'https://m-arvin-sobat.pbp.cs.ui.ac.id/resep/flutter_add/$productId/',
         {},
       );
 
@@ -188,7 +190,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Future<void> deleteProduct(String productId, bool isinProduct) async {
     try {
       final response = await http.delete(
-        Uri.parse('http://127.0.0.1:8000/favorite/api/$productId/'),
+        Uri.parse(
+            'https://m-arvin-sobat.pbp.cs.ui.ac.id/favorite/api/$productId/'),
         headers: {
           'Content-Type': 'application/json',
           // Sertakan CSRF token
@@ -221,6 +224,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
     return Scaffold(
+      drawer: LeftDrawer(),
       appBar: AppBar(
         title: const Text("Daftar Produk Favorit"),
       ),
@@ -265,8 +269,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
                             productDetailsMap[productId]["category"];
 
                         ;
-
-                       
 
                         return Padding(
                           padding: const EdgeInsets.symmetric(

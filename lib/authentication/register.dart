@@ -55,7 +55,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(12.0)),
                   ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 5.0),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 8, vertical: 5.0),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -73,7 +74,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(12.0)),
                   ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -91,7 +93,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(12.0)),
                   ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
                 ),
                 obscureText: true,
                 validator: (value) {
@@ -110,7 +113,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(12.0)),
                   ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
                 ),
                 obscureText: true,
                 validator: (value) {
@@ -141,12 +145,14 @@ class _RegisterPageState extends State<RegisterPage> {
                     _selectedRole = value;
                   });
                 },
-                validator: (value) => value == null ? 'Please select a role' : null,
+                validator: (value) =>
+                    value == null ? 'Please select a role' : null,
               ),
               const SizedBox(height: 12.0),
               ElevatedButton(
                 onPressed: () async {
-                  if (_passwordController.text != _confirmPasswordController.text) {
+                  if (_passwordController.text !=
+                      _confirmPasswordController.text) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Passwords do not match!')),
                     );
@@ -154,7 +160,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   }
 
                   final response = await request.postJson(
-                    "http://127.0.0.1:8000/register_mobile/",  // Updated URL for Android emulator
+                    "https://m-arvin-sobat.pbp.cs.ui.ac.id/register_mobile/", // Updated URL for Android emulator
                     jsonEncode({
                       "nama": _namaController.text,
                       "username": _usernameController.text,
@@ -167,15 +173,19 @@ class _RegisterPageState extends State<RegisterPage> {
                   if (context.mounted) {
                     if (response['status'] == 'success') {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Successfully registered!')),
+                        const SnackBar(
+                            content: Text('Successfully registered!')),
                       );
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => const LoginPage()),
+                        MaterialPageRoute(
+                            builder: (context) => const LoginPage()),
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(response['message'] ?? 'Failed to register!')),
+                        SnackBar(
+                            content: Text(
+                                response['message'] ?? 'Failed to register!')),
                       );
                     }
                   }

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:sobat_mobile/widgets/left_drawer.dart';
 
 class EditReviewPage extends StatefulWidget {
   final String reviewID;
@@ -37,6 +38,7 @@ class _EditReviewPageState extends State<EditReviewPage> {
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
     return Scaffold(
+      drawer: LeftDrawer(),
       appBar: AppBar(
         title: const Text('Edit Review'),
         backgroundColor: Theme.of(context).colorScheme.primary,
