@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:sobat_mobile/daftar_favorite/models/models.dart';
+import 'package:sobat_mobile/daftar_favorite/screens/detail.dart';
 import 'package:sobat_mobile/daftar_favorite/widgets/list_product.dart';
 import 'package:sobat_mobile/drug/models/drug_entry.dart';
 import 'package:sobat_mobile/drug/screens/drug_detail.dart';
@@ -19,6 +22,7 @@ class ProductListScreen extends StatefulWidget {
 class _ProductListScreenState extends State<ProductListScreen> {
   List<FavoriteEntry> favoriteProducts = [];
   final String baseUrl = 'http://localhost:8000/media/';
+  TextEditingController _newController = new TextEditingController();
   // int totalFavorit = 0;
 
   Map<String, dynamic> productDetailsMap = {};
@@ -34,7 +38,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Future<List<FavoriteEntry>> fetchMood(CookieRequest request) async {
     final response = await request.get('http://127.0.0.1:8000/favorite/json/');
     var data = response;
-    print(data);
 
     // Melakukan konversi data json menjadi object MoodEntry
     List<FavoriteEntry> listMood = [];
@@ -61,9 +64,25 @@ class _ProductListScreenState extends State<ProductListScreen> {
     return listMood;
   }
 
-  Future<DrugModel> fetchDrugDetails(String productId) async {
-    print("Fetching product with ID: $productId");
+  Future<void> editFavorite(
+      String favoriteId, String newNote, CookieRequest request) async {
+    // final response = await request.get('http://127.0.0.1:8000/favorite/api/edit/$favoriteId/');
+    final url = await request.get('http://127.0.0.1:8000/favorite/json/');
+    var data = url;
 
+    try {
+      final response = await request.postJson(
+        url,
+        jsonEncode(<String, String>{
+          "catatan": newNote,
+        }),
+      );
+    } catch (e) {
+      print("Request failed: $e");
+    }
+  }
+
+  Future<DrugModel> fetchDrugDetails(String productId) async {
     final response = await http.get(
       Uri.parse('http://127.0.0.1:8000/product/json/$productId/'),
     );
@@ -83,16 +102,20 @@ class _ProductListScreenState extends State<ProductListScreen> {
     }
   }
 
-  void navigateToProductDetail(
-      BuildContext context, String productId, String productPk) async {
+  void navigateToProductDetail(BuildContext context, String productId,
+      String productPk, CookieRequest request) async {
     try {
       DrugModel product = await fetchDrugDetails(productId);
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ProductDetailPage(
+          builder: (context) => detailPage(
             product: product.fields,
-            detailRoute: () => deleteProduct(productPk),
+
+            // detailRoute: () => deleteProduct(productPk),
+            detailRoute: () => showConfirm(productPk, true),
+            pk: productPk,
+            request: request,
           ),
         ),
       );
@@ -103,7 +126,23 @@ class _ProductListScreenState extends State<ProductListScreen> {
     }
   }
 
-  Future<void> deleteProduct(String productId) async {
+  void showConfirm(String productId, bool isInProduct) {
+    setState(() {
+      QuickAlert.show(
+        context: context,
+        type: QuickAlertType.confirm,
+        text: "Do you want to Remove",
+        confirmBtnText: "Yes",
+        cancelBtnText: "NO",
+        onConfirmBtnTap: () async {
+          await deleteProduct(
+              productId, isInProduct); // Panggil fungsi penghapusan
+        },
+      );
+    });
+  }
+
+  Future<void> deleteProduct(String productId, bool isinProduct) async {
     try {
       final response = await http.delete(
         Uri.parse('http://127.0.0.1:8000/favorite/api/$productId/'),
@@ -114,12 +153,18 @@ class _ProductListScreenState extends State<ProductListScreen> {
       );
 
       if (response.statusCode == 200) {
-        print('Produk berhasil dihapus');
         List<FavoriteEntry> updatedFavorites = await fetchMood(CookieRequest());
-        setState(() {
-          favoriteProducts = updatedFavorites; // Perbarui state
-        });
-        // await fetchMood(CookieRequest());
+        setState(
+          () {
+            favoriteProducts = updatedFavorites; // Perbarui state
+          },
+        );
+        if (isinProduct) {
+          Navigator.pop(context);
+          Navigator.pop(context);
+        } else {
+          Navigator.pop(context);
+        }
       } else {
         print('Gagal menghapus produk. Status: ${response.statusCode}');
       }
@@ -160,41 +205,46 @@ class _ProductListScreenState extends State<ProductListScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
               child: Column(
                 children: [
-                  ListView.builder(
-                    physics: NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: products.length,
-                    itemBuilder: (context, index) {
-                      final product = products[index];
-                      String productId = product.fields.product;
-                      String url = productDetailsMap[productId]["image"];
-                      String imageUrl = '$baseUrl$url';
-                      String productPk = productPKMap[productId] ?? '';
-                      String drugForm =
-                          productDetailsMap[productId]["drug_form"];
-                      String drugCategory =
-                          productDetailsMap[productId]["category"];
+                  Expanded(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: products.length,
+                      itemBuilder: (context, index) {
+                        final product = products[index];
+                        String productId = product.fields.product;
+                        String url = productDetailsMap[productId]["image"];
+                        String imageUrl = '$baseUrl$url';
+                        String productPk = productPKMap[productId] ?? '';
+                        String drugForm =
+                            productDetailsMap[productId]["drug_form"];
+                        String drugCategory =
+                            productDetailsMap[productId]["category"];
 
-                      ;
+                        ;
 
-                      // Get the product details from the map (this should be updated once product data is loaded)
-                      // Map<String, dynamic>? productDetails =
-                      //     productDetailsMap[productId];
-                      // String productName = productDetails != null
-                      //     ? productDetails['fields']['name']
-                      //     : 'Loading...';
+                        // Get the product details from the map (this should be updated once product data is loaded)
+                        // Map<String, dynamic>? productDetails =
+                        //     productDetailsMap[productId];
+                        // String productName = productDetails != null
+                        //     ? productDetails['fields']['name']
+                        //     : 'Loading...';
 
-                      return productTile(
-                        name: productDetailsMap[productId]["name"],
-                        price: productDetailsMap[productId]["price"],
-                        imageUrl: imageUrl,
-                        onPressed: () => deleteProduct(productPk),
-                        drugForm: drugForm,
-                        category: drugCategory,
-                        detailRoute: () => navigateToProductDetail(
-                            context, productId, productPk),
-                      );
-                    },
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 8.0, horizontal: 5),
+                          child: productTile(
+                            name: productDetailsMap[productId]["name"],
+                            price: productDetailsMap[productId]["price"],
+                            imageUrl: imageUrl,
+                            onPressed: () => showConfirm(productPk, false),
+                            drugForm: drugForm,
+                            category: drugCategory,
+                            detailRoute: () => navigateToProductDetail(
+                                context, productId, productPk, request),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),
