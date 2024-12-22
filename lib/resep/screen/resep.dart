@@ -87,29 +87,29 @@ class _ProductListScreenState extends State<CartList> {
     }
   }
 
-  void navigateToProductDetail(BuildContext context, String productId,
-      String productPk, CookieRequest request) async {
-    try {
-      DrugModel product = await fetchDrugDetails(productId);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => detailPage(
-            product: product.fields,
+  // void navigateToProductDetail(BuildContext context, String productId,
+  //     String productPk, CookieRequest request) async {
+  //   try {
+  //     DrugModel product = await fetchDrugDetails(productId);
+  //     Navigator.push(
+  //       context,
+  //       MaterialPageRoute(
+  //         builder: (context) => detailPage(
+  //           product: product.fields,
 
-            // detailRoute: () => deleteProduct(productPk),
-            detailRoute: () => showConfirm(productPk, true),
-            pk: productPk,
-            request: request,
-          ),
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Gagal memuat detail produk: $e")),
-      );
-    }
-  }
+  //           // detailRoute: () => deleteProduct(productPk),
+  //           detailRoute: () => showConfirm(productPk, true),
+  //           pk: productPk,
+  //           request: request,
+  //         ),
+  //       ),
+  //     );
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text("Gagal memuat detail produk: $e")),
+  //     );
+  //   }
+  // }
 
   void showConfirm(String productId, bool isInProduct) {
     setState(() {
@@ -312,7 +312,10 @@ class _ProductListScreenState extends State<CartList> {
                     onPressed: () {
                       _showConfirmationDialog(context, products, totalPrice, request);
                     },
-                    child: Text('Checkout'),
+                    child: Text('Checkout', style: TextStyle(color: const Color.fromARGB(255, 211, 239, 211))),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green, // Set the background color to green
+                    ),
                   ),
                 ],
               ),
@@ -363,18 +366,24 @@ class _ProductListScreenState extends State<CartList> {
           ),
         ),
         actions: [
-          TextButton(
+          ElevatedButton(
             onPressed: () {
               Navigator.of(context).pop();
               removeAll(request);
             },
-            child: Text('Remove all medications', style: TextStyle(color: Colors.red)),
+            child: Text('Remove all medications', style: TextStyle(color: const Color.fromARGB(255, 252, 225, 223))),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red, // Set the background color to green
+            ),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: Text('Back to prescription'),
+            child: Text('Back to prescription', style: TextStyle(color: const Color.fromARGB(255, 211, 239, 211))),
+            style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green, // Set the background color to green
+                    ),
           ),
         ],
       );

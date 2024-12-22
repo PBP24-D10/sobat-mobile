@@ -60,7 +60,9 @@ class _ResepTileState extends State<ResepTile> {
     ).format(widget.price * widget.quantity);
 
     return Card(
+      elevation: 4,
       margin: EdgeInsets.all(10),
+      shadowColor: Colors.grey.withOpacity(0.5),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
