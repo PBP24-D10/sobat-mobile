@@ -77,7 +77,7 @@ class LeftDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(FontAwesomeIcons.comments),
+            leading: const Icon(FontAwesomeIcons.solidComments),
             title: const Text('Forum'),
             onTap: () {
               Navigator.push(

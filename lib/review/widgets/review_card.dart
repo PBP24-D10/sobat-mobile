@@ -76,14 +76,16 @@ class ReviewTile extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.red),
                     onPressed: () async {
                       // Show confirmation dialog
                       bool? confirmDelete = await showDialog<bool>(
                         context: context,
                         builder: (context) => AlertDialog(
                           title: const Text("Confirm Delete"),
-                          content: const Text("Are you sure you want to delete this review?"),
+                          content: const Text(
+                              "Are you sure you want to delete this review?"),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(context, false),
@@ -112,7 +114,8 @@ class ReviewTile extends StatelessWidget {
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text("Failed to delete review. Please try again."),
+                                content: Text(
+                                    "Failed to delete review. Please try again."),
                               ),
                             );
                           }
