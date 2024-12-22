@@ -132,7 +132,8 @@ class _EditReviewPageState extends State<EditReviewPage> {
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text("An error occurred. Please try again."),
+                                content: Text(
+                                    "An error occurred. Please try again."),
                               ),
                             );
                           }
@@ -140,9 +141,10 @@ class _EditReviewPageState extends State<EditReviewPage> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black, 
+                      backgroundColor: Colors.black,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
                     ),
                     child: const Text(
                       "Update",
