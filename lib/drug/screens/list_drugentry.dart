@@ -49,11 +49,52 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
     );
   }
 
+  Future<void> addToResep(String productId, CookieRequest request) async {
+    try {
+      // Send POST request to favorite endpoint
+      final response = await request.post(
+        'http://127.0.0.1:8000/resep/flutter_add/$productId/',
+        {},
+      );
+
+      if (response['status'] == 'success') {
+        // If successful, show success dialog
+        QuickAlert.show(
+          context: context,
+          type: QuickAlertType.success,
+          title: 'Berhasil!',
+          text: 'Produk berhasil ditambahkan ke resep.',
+          autoCloseDuration: Duration(seconds: 1),
+          disableBackBtn: true,
+          showConfirmBtn: false,
+        );
+
+        print('Produk berhasil ditambahkan ke resep!');
+        // Optionally, update the UI or state here
+      } else {
+        // If the product is already in favorites, show error dialog
+        QuickAlert.show(
+          context: context,
+          type: QuickAlertType.error,
+          title: 'Gagal!',
+          text: 'Produk sudah ada di resep.',
+          confirmBtnText: 'Kembali',
+          onConfirmBtnTap: () {
+            Navigator.pop(context); // Close the dialog
+          },
+        );
+      }
+    } catch (error) {
+      print('Terjadi kesalahan: $error');
+      // Optionally, show an error dialog here
+    }
+  }
+
   Future<void> addToFavorite(String productId, CookieRequest request) async {
     try {
       // Send POST request to favorite endpoint
       final response = await request.post(
-        'http://m-arvin-sobat.pbp.cs.ui.ac.id/favorite/api/add/$productId/',
+        'http://127.0.0.1:8000/favorite/api/add/$productId/',
         {},
       );
 
@@ -91,7 +132,7 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
   }
 
   Future<bool> deleteProduct(String productId) async {
-    final url = 'http://m-arvin-sobat.pbp.cs.ui.ac.id/product/delete-drug/$productId/';
+    final url = 'http://127.0.0.1:8000/product/delete-drug/$productId/';
     final response = await http.get(Uri.parse(url));
 
     return response.statusCode == 200;
@@ -140,6 +181,7 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
                             product: product,
                             detailRoute: () =>
                                 addToFavorite(product.pk, request),
+                            onPressed: () => addToResep(product.pk, request),
                           ),
                         ),
                       );

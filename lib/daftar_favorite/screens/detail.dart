@@ -10,6 +10,7 @@ import 'package:sobat_mobile/drug/models/drug_entry.dart';
 class detailPage extends StatefulWidget {
   final DrugEntry product;
   final void Function()? detailRoute;
+  final void Function()? addCart;
   final String pk;
   final CookieRequest request;
 
@@ -18,7 +19,8 @@ class detailPage extends StatefulWidget {
       required this.product,
       required this.detailRoute,
       required this.pk,
-      required this.request});
+      required this.request,
+      required this.addCart});
 
   @override
   State<detailPage> createState() => _detailPageState();
@@ -205,6 +207,7 @@ class _detailPageState extends State<detailPage> {
                     fontWeight: FontWeight.bold),
               ),
               GestureDetector(
+                onTap: widget.addCart,
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.black,
