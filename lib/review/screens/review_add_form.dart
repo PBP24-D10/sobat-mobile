@@ -84,6 +84,9 @@ class _ReviewFormPageState extends State<ReviewFormPage> {
                     }
                     return null;
                   },
+                  keyboardType: TextInputType.multiline,
+                  minLines: 3,
+                  maxLines: null,
                 ),
               ),
               Align(
@@ -94,7 +97,7 @@ class _ReviewFormPageState extends State<ReviewFormPage> {
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         final response = await request.postJson(
-                          "http://localhost:8000/review/${widget.productID}/create-flutter/",
+                          "http://m-arvin-sobat.pbp.cs.ui.ac.id/review/${widget.productID}/create-flutter/",
                           jsonEncode(<String, dynamic>{
                             'rating': _rating,
                             'comment': _comment,
@@ -107,7 +110,7 @@ class _ReviewFormPageState extends State<ReviewFormPage> {
                                 content: Text("Review successfully saved!"),
                               ),
                             );
-                            Navigator.pop(context);
+                            Navigator.pop(context, true);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -118,6 +121,11 @@ class _ReviewFormPageState extends State<ReviewFormPage> {
                         }
                       }
                     },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    ),
                     child: const Text(
                       "Save",
                       style: TextStyle(color: Colors.white),

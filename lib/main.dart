@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sobat_mobile/colors.dart';
 import 'package:sobat_mobile/daftar_favorite/screens/daftar_favorite.dart';
 import 'package:sobat_mobile/drug/screens/list_drugentry.dart';
 import 'package:sobat_mobile/homepage.dart';
@@ -27,10 +28,11 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Sobat',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        primaryColor: AppColors.primary,
+          colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
           useMaterial3: true,
         ),
-        home: const WelcomePage(),
+        home: const LoginPage(),
       ),
     );
   }

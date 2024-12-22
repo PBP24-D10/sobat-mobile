@@ -15,9 +15,6 @@ class LoginApp extends StatelessWidget {
       title: 'Login',
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSwatch(
-          primarySwatch: Colors.deepPurple,
-        ).copyWith(secondary: Colors.deepPurple[400]),
       ),
       home: const LoginPage(),
     );
@@ -32,10 +29,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController _namaController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _roleController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -109,18 +104,14 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 24.0),
                   ElevatedButton(
                     onPressed: () async {
-                      String nama = _namaController.text;
                       String username = _usernameController.text;
                       String password = _passwordController.text;
-                      String role = _roleController.text;
 
                       // Cek kredensial
                       final response = await request
-                          .login("http://127.0.0.1:8000/login_mobile/", {
-                        'nama': nama,
+                          .login("https://m-arvin-sobat.pbp.cs.ui.ac.id/login_mobile/", {
                         'username': username,
                         'password': password,
-                        'role': role,
                       });
 
                       if (request.loggedIn) {
@@ -135,8 +126,28 @@ class _LoginPageState extends State<LoginPage> {
                         if (context.mounted) {
                           Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(
-                                builder: (context) => const MyHomePage()),
+                            PageRouteBuilder(
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) =>
+                                      const MyHomePage(),
+                              transitionsBuilder: (context, animation,
+                                  secondaryAnimation, child) {
+                                const begin = Offset(
+                                    1.0, 0.0); // Halaman masuk dari kanan
+                                const end = Offset
+                                    .zero; // Halaman berhenti di posisi normal
+                                const curve = Curves.easeInOut;
+
+                                var tween = Tween(begin: begin, end: end)
+                                    .chain(CurveTween(curve: curve));
+                                var offsetAnimation = animation.drive(tween);
+
+                                return SlideTransition(
+                                  position: offsetAnimation,
+                                  child: child,
+                                );
+                              },
+                            ),
                           );
                           ScaffoldMessenger.of(context)
                             ..hideCurrentSnackBar()
@@ -167,8 +178,8 @@ class _LoginPageState extends State<LoginPage> {
 
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      minimumSize: const Size(double.infinity, 50),
-                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      minimumSize: Size(double.infinity, 50),
+                      backgroundColor: Theme.of(context).primaryColor,
                       padding: const EdgeInsets.symmetric(vertical: 16.0),
                     ),
                     child: const Text('Login'),
@@ -177,13 +188,14 @@ class _LoginPageState extends State<LoginPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
+                      const Text(
                         'Don\'t have an account?',
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
+                          color: Colors.black,
                           fontSize: 16.0,
                         ),
                       ),
+                      const SizedBox(width: 4),
                       GestureDetector(
                         onTap: () {
                           Navigator.push(

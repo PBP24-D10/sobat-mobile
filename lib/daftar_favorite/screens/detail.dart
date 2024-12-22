@@ -1,15 +1,59 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:sobat_mobile/drug/models/drug_entry.dart';
-import 'package:sobat_mobile/drug/widgets/button_review.dart';
-import 'package:sobat_mobile/forum/screens/forum.dart';
-import 'package:sobat_mobile/review/screens/review_page.dart';
 
-class ProductDetailPage extends StatelessWidget {
-  final DrugModel product;
-  //  final DrugEntry product;
+class detailPage extends StatefulWidget {
+  final DrugEntry product;
   final void Function()? detailRoute;
+  final String pk;
+  final CookieRequest request;
+
+  const detailPage(
+      {super.key,
+      required this.product,
+      required this.detailRoute,
+      required this.pk,
+      required this.request});
+
+  @override
+  State<detailPage> createState() => _detailPageState();
+}
+
+Future<void> editFavorite(
+    String favoriteId, String newNote, CookieRequest request) async {
+  // final response = await request.get('http://127.0.0.1:8000/favorite/api/edit/$favoriteId/');
+  final url = 'http://127.0.0.1:8000/favorite/api/edit/$favoriteId/';
+  if (newNote.isNotEmpty) {
+    try {
+      final response = await request.post(
+          'http://127.0.0.1:8000/favorite/api/edit/$favoriteId/',
+          {"catatan": newNote});
+    } catch (e) {
+      print("Request failed: $e");
+    }
+  }
+}
+
+TextEditingController test = TextEditingController();
+
+class _detailPageState extends State<detailPage> {
+  Future<void> fetchFavoriteNote() async {
+    final url =
+        'http://127.0.0.1:8000/favorite/favorites/json/'; // Adjust the URL if needed
+    final response = await widget.request.get(url);
+    var data = response;
+
+    for (var w in data) {
+      if (w["id"] == widget.pk) {
+        test.text = w["catatan"];
+      }
+    }
+  }
 
   String formatedPrice(int price) {
     final formattedPrice = NumberFormat.currency(
@@ -20,44 +64,29 @@ class ProductDetailPage extends StatelessWidget {
     return formattedPrice;
   }
 
-  const ProductDetailPage(
-      {super.key, required this.product, required this.detailRoute});
+  @override
+  void initState() {
+    super.initState();
+    // Fetch the note when the page loads
+    fetchFavoriteNote();
+  }
 
   // Define the base URL
-  final String baseUrl = 'http://m-arvin-sobat.pbp.cs.ui.ac.id/media/';
+  final String baseUrl = 'http://localhost:8000/media/';
 
   @override
   Widget build(BuildContext context) {
-    void showReview() {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ReviewPage(
-              productID: product.pk,
-              productName: product.fields.name,
-              productPrice: product.fields.price.toString(),
-              image: product.fields.image),
-        ),
-      );
-    }
-
-    void showForum() {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ForumPage(),
-        ),
-      );
-    }
-
-    String imageUrl = '$baseUrl${product.fields.image}';
+    String imageUrl = '$baseUrl${widget.product.image}';
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(product.fields.name),
+        title: Text(widget.product.name),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => {
+            editFavorite(widget.pk, test.text, widget.request),
+            Navigator.of(context).pop()
+          },
         ),
       ),
       body: SingleChildScrollView(
@@ -71,7 +100,7 @@ class ProductDetailPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   IconButton(
-                    onPressed: detailRoute,
+                    onPressed: widget.detailRoute,
                     icon: CircleAvatar(
                       radius: 18,
                       backgroundColor: Colors.red,
@@ -100,51 +129,63 @@ class ProductDetailPage extends StatelessWidget {
               const SizedBox(height: 24),
               // Product Details
               Text(
-                product.fields.name,
+                widget.product.name,
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
               ),
               Text(
-                product.fields.drugForm,
+                widget.product.drugForm,
                 style: const TextStyle(fontSize: 20),
               ),
               const SizedBox(height: 16),
-              Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: customButton(
-                        onPressed: () => showReview(),
-                        icon: FontAwesomeIcons.commentDots,
-                        text: "Review"),
-                  ),
-                  customButton(
-                      onPressed: () => showForum(),
-                      icon: FontAwesomeIcons.solidComments,
-                      text: "Forum"),
-                ],
-              ),
               Text(
                 "Deskripsi",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               Text(
-                product.fields.desc,
+                widget.product.desc,
                 style: TextStyle(
                   fontSize: 18,
                   height: 1.5,
                   color: Colors.grey[600],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 10),
               Text(
-                "Tipe Obat:",
+                "Tipe Obat",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               Text(
-                product.fields.drugType,
+                widget.product.drugType,
                 style: const TextStyle(fontSize: 18),
               ),
               const SizedBox(height: 10),
+
+              Text(
+                "Kategori",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              Text(
+                widget.product.category,
+                style: const TextStyle(fontSize: 18),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                "Catatan",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+
+              TextField(
+                controller: test, // Sambungkan controller ke TextField
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 5,
+                minLines: 3,
+              ),
+              // ElevatedButton(
+              //     onPressed: () =>
+              //         editFavorite(widget.pk, test.text, widget.request),
+              //     child: Text("Save"))
             ],
           ),
         ),
@@ -157,14 +198,13 @@ class ProductDetailPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "${formatedPrice(product.fields.price)}",
+                "${formatedPrice(widget.product.price)}",
                 style: TextStyle(
                     fontSize: 20,
                     color: Colors.white,
                     fontWeight: FontWeight.bold),
               ),
               GestureDetector(
-                onTap: () {},
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.black,

@@ -102,6 +102,9 @@ class _EditReviewPageState extends State<EditReviewPage> {
                     }
                     return null;
                   },
+                  keyboardType: TextInputType.multiline,
+                  minLines: 3,
+                  maxLines: null,
                 ),
               ),
               Align(
@@ -112,7 +115,7 @@ class _EditReviewPageState extends State<EditReviewPage> {
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         final response = await request.postJson(
-                          "http://localhost:8000/review/${widget.productID}/${widget.reviewID}/edit-flutter/",
+                          "http://m-arvin-sobat.pbp.cs.ui.ac.id/review/${widget.productID}/${widget.reviewID}/edit-flutter/",
                           jsonEncode(<String, dynamic>{
                             'rating': _rating,
                             'comment': _comment,
@@ -125,17 +128,24 @@ class _EditReviewPageState extends State<EditReviewPage> {
                                 content: Text("Review has been updated!"),
                               ),
                             );
-                            Navigator.pop(context);
+                            Navigator.pop(context, true);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text("An error occurred. Please try again."),
+                                content: Text(
+                                    "An error occurred. Please try again."),
                               ),
                             );
                           }
                         }
                       }
                     },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
+                    ),
                     child: const Text(
                       "Update",
                       style: TextStyle(color: Colors.white),

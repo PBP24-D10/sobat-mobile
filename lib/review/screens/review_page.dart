@@ -9,12 +9,15 @@ class ReviewPage extends StatefulWidget {
   final String productName;
   final String productPrice;
   final String productID;
+  final String image;
+  final String baseUrl = 'http://m-arvin-sobat.pbp.cs.ui.ac.id/media/';
 
   const ReviewPage({
     super.key,
     required this.productName,
     required this.productPrice,
     required this.productID,
+    required this.image,
   });
 
   @override
@@ -24,7 +27,7 @@ class ReviewPage extends StatefulWidget {
 class _ReviewPageState extends State<ReviewPage> {
   Future<List<Review>> fetchReviews(CookieRequest request) async {
     var id = widget.productID;
-    final response = await request.get('http://localhost:8000/review/$id/json/');
+    final response = await request.get('http://m-arvin-sobat.pbp.cs.ui.ac.id/review/$id/json/');
     var data = response;
     List<Review> reviewList = [];
     for (var d in data) {
@@ -51,8 +54,9 @@ class _ReviewPageState extends State<ReviewPage> {
 
   @override
   Widget build(BuildContext context) {
-    final request = context.watch<CookieRequest>();
+    final request = context.read<CookieRequest>();
     String role = request.jsonData['role'];
+    String imageUrl = '${widget.baseUrl}${widget.image}';
     return Scaffold(
       appBar: AppBar(
         title: const Text('Reviews'),
@@ -69,9 +73,17 @@ class _ReviewPageState extends State<ReviewPage> {
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
-              child: Column(
+              child: 
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Center( child: Image.network(imageUrl, fit: BoxFit.cover,
+                  width: MediaQuery.of(context).size.width - 32,
+                  height: 200,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Text('Unable to load image', textAlign: TextAlign.center);
+                  })),
+                  const SizedBox(height: 24),
                   Center(
                     child: Column(
                       children: [
@@ -114,7 +126,9 @@ class _ReviewPageState extends State<ReviewPage> {
                                 builder: (context) => ReviewFormPage(productID: widget.productID),
                               ),
                             ).then((value) {
-                              if (value == true) refreshReviews();
+                              if (value == true) {
+                                refreshReviews();
+                              }
                             });
                           },
                           child: const Text('Add Review'),
@@ -145,6 +159,12 @@ class _ReviewPageState extends State<ReviewPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Center( child: Image.network(imageUrl, fit: BoxFit.cover,
+                  width: MediaQuery.of(context).size.width - 32,
+                  height: 200,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Text('Unable to load image', textAlign: TextAlign.center);
+                  })),
                   Center(
                     child: Column(
                       children: [
@@ -187,7 +207,9 @@ class _ReviewPageState extends State<ReviewPage> {
                                 builder: (context) => ReviewFormPage(productID: widget.productID),
                               ),
                             ).then((value) {
-                              if (value == true) refreshReviews();
+                              if (value == true) {
+                                refreshReviews();
+                              }
                             });
                           },
                           child: const Text('Add Review'),
@@ -210,7 +232,7 @@ class _ReviewPageState extends State<ReviewPage> {
                     children: reviews.map((review) {
                       return ReviewTile(
                         review,
-                        onDelete: refreshReviews,
+                        onChanged: refreshReviews,
                       );
                     }).toList(),
                   ),

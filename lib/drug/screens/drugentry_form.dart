@@ -1,164 +1,160 @@
+import 'dart:io';
+import 'dart:async';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-// import 'package:sobat_mobile/drug/widgets/left_drawer.dart';
-import 'package:pbp_django_auth/pbp_django_auth.dart';
-import 'package:provider/provider.dart';
-import 'package:sobat_mobile/homepage.dart';
-import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 
-class ProductEntryFormPage extends StatefulWidget {
-  const ProductEntryFormPage({super.key});
-
+class AddDrugForm extends StatefulWidget {
   @override
-  State<ProductEntryFormPage> createState() => _ProductEntryFormPageState();
+  _AddDrugFormState createState() => _AddDrugFormState();
 }
 
-class _ProductEntryFormPageState extends State<ProductEntryFormPage> {
+class _AddDrugFormState extends State<AddDrugForm> {
   final _formKey = GlobalKey<FormState>();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController descController = TextEditingController();
+  TextEditingController categoryController = TextEditingController();
+  TextEditingController drugTypeController = TextEditingController();
+  TextEditingController drugFormController = TextEditingController();
+  TextEditingController priceController = TextEditingController();
+  Uint8List? _image;
+  String? _imageName;
 
-  String _name = ""; //mood
-  String _description = ""; //feelings
-  int _amount = 0; //moodInt
+  Future<void> pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      if (kIsWeb) {
+        // Handling for Flutter Web
+        final bytes = await pickedFile.readAsBytes();
+        setState(() {
+          _image = bytes;
+          _imageName = pickedFile.name;
+        });
+      } else {
+        // Handling for Mobile
+        final file = File(pickedFile.path);
+        final bytes = await file.readAsBytes();
+        setState(() {
+          _image = bytes;
+          _imageName = pickedFile.name;
+        });
+      }
+    }
+  }
+
+  Future<void> submitDrug() async {
+    if (_formKey.currentState!.validate()) {
+      var uri = Uri.parse('http://m-arvin-sobat.pbp.cs.ui.ac.id/product/create-drug-ajax/');
+      var request = http.MultipartRequest('POST', uri)
+        ..fields['name'] = nameController.text
+        ..fields['desc'] = descController.text
+        ..fields['category'] = categoryController.text
+        ..fields['drug_type'] = drugTypeController.text
+        ..fields['drug_form'] = drugFormController.text
+        ..fields['price'] = priceController.text;
+
+      if (_image != null && _imageName != null) {
+        request.files.add(http.MultipartFile.fromBytes('image', _image!, filename: _imageName));
+      }
+
+      var response = await request.send();
+      if (response.statusCode == 201) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Drug added successfully')));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to add drug')));
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final request = context.watch<CookieRequest>();
     return Scaffold(
-      appBar: AppBar(
-        title: const Center(
-          child: Text(
-            'Form Tambah Produk',
-          ),
-        ),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.white,
-      ),
-      // drawer: const LeftDrawer(),
+      appBar: AppBar(title: Text('Add Drug Entry')),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
+          padding: EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    hintText: "Contoh: Beras Sumo",
-                    labelText: "Nama Produk",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                  ),
-                  onChanged: (String? value) {
-                    setState(() {
-                      _name = value!;
-                    });
-                  },
-                  validator: (String? value) {
-                    if (value == null || value.isEmpty) {
-                      return "Nama produk tidak boleh kosong!";
-                    }
-                    return null;
-                  },
-                ),
+            children: <Widget>[
+              TextFormField(
+                controller: nameController,
+                decoration: InputDecoration(labelText: 'Name'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the drug name';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: descController,
+                decoration: InputDecoration(labelText: 'Description'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a description';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: categoryController,
+                decoration: InputDecoration(labelText: 'Category'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a category';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: drugTypeController,
+                decoration: InputDecoration(labelText: 'Drug Type'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the drug type';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: drugFormController,
+                decoration: InputDecoration(labelText: 'Drug Form'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the drug form';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: priceController,
+                decoration: InputDecoration(labelText: 'Price'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the price';
+                  }
+                  if (int.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
+                  return null;
+                },
+                keyboardType: TextInputType.number,
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    hintText: "Contoh: Beras Sumo: Beras pulen dari petani pilihan",
-                    labelText: "Deskripsi",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                  ),
-                  onChanged: (String? value) {
-                    setState(() {
-                      _description = value!;
-                    });
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    pickImage();
                   },
-                  validator: (String? value) {
-                    if (value == null || value.isEmpty) {
-                      return "Deskripsi tidak boleh kosong!";
-                    }
-                    return null;
-                  },
+                  child: Text('Pick Image'),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    hintText: "Contoh: 5 kg",
-                    labelText: "Amount",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                  ),
-                  onChanged: (String? value) {
-                    setState(() {
-                      _amount = int.tryParse(value!) ?? 0;
-                    });
-                  },
-                  validator: (String? value) {
-                    if (value == null || value.isEmpty) {
-                      return "Amount tidak boleh kosong!";
-                    }
-                    if (int.tryParse(value) == null) {
-                      return "Amount harus berupa angka!";
-                    }
-                    return null;
-                  },
-                ),
-              ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all(
-                          Theme.of(context).colorScheme.primary),
-                    ),
-                    onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                            // Kirim ke Django dan tunggu respons
-                            // TODO: Ganti URL dan jangan lupa tambahkan trailing slash (/) di akhir URL!
-                            final response = await request.postJson(
-                                "http://localhost:8000/create-flutter/",
-                                jsonEncode(<String, String>{
-                                    'name': _name,
-                                    'amount': _amount.toString(),
-                                    'description': _description,
-                                // TODO: Sesuaikan field data sesuai dengan aplikasimu
-                                }),
-                            );
-                            if (context.mounted) {
-                                if (response['status'] == 'success') {
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(const SnackBar(
-                                    content: Text("Produk baru berhasil disimpan!"),
-                                    ));
-                                    Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => MyHomePage()),
-                                    );
-                                } else {
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(const SnackBar(
-                                        content:
-                                            Text("Terdapat kesalahan, silakan coba lagi."),
-                                    ));
-                                }
-                            }
-                        }
-                    },
-                    child: const Text(
-                      "Save",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ),
+              ElevatedButton(
+                onPressed: submitDrug,
+                child: Text('Submit'),
               ),
             ],
           ),
