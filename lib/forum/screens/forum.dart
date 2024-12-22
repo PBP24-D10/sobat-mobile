@@ -118,7 +118,7 @@ class _ForumPageState extends State<ForumPage> {
   Future<void> handleDelete(CookieRequest request, Question question) async {
     try {
       final response = await request.post(
-          'http://127.0.0.1:8000/forum/delete_question_flutter/${question.pk}/',
+          'https://m-arvin-sobat.pbp.cs.ui.ac.id/forum/delete_question_flutter/${question.pk}/',
           {});
 
       if (response['status'] == 'success') {
