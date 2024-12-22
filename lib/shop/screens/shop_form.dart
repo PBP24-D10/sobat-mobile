@@ -1,9 +1,6 @@
-// screens/shop_form.dart
-
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-import 'package:flutter/foundation.dart';
+import 'dart:typed_data';  // For handling image bytes
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -11,7 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:sobat_mobile/shop/screens/shop_main_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'dart:html' as html;
 
 class ShopFormPage extends StatefulWidget {
   const ShopFormPage({super.key});
@@ -26,8 +22,8 @@ class _ShopFormPageState extends State<ShopFormPage> {
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _openingTimeController = TextEditingController();
   final TextEditingController _closingTimeController = TextEditingController();
-  File? _selectedImage;
-  String? _selectedImageBase64;
+  XFile? _selectedImage;
+  Uint8List? _imageBytes;  // To store image bytes
 
   @override
   void dispose() {
@@ -38,8 +34,7 @@ class _ShopFormPageState extends State<ShopFormPage> {
     super.dispose();
   }
 
-  Future<void> _selectTime(
-      BuildContext context, TextEditingController controller) async {
+  Future<void> _selectTime(BuildContext context, TextEditingController controller) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
@@ -51,52 +46,15 @@ class _ShopFormPageState extends State<ShopFormPage> {
     }
   }
 
-  Future<String?> _pickImageWeb() async {
-    final completer = Completer<String>();
-    final uploadInput = html.FileUploadInputElement();
-    uploadInput.accept = 'image/*';
-    uploadInput.click();
-
-    uploadInput.onChange.listen((event) async {
-      final file = uploadInput.files?.first;
-      if (file != null) {
-        final reader = html.FileReader();
-        reader.readAsDataUrl(file);
-        reader.onLoadEnd.listen((_) {
-          completer.complete(reader.result as String);
-        });
-      }
-    });
-
-    return completer.future;
-  }
-
-  Future<File?> _pickImageNonWeb() async {
-    final pickedImage =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedImage != null) {
-      return File(pickedImage.path);
-    }
-    return null;
-  }
-
   Future<void> _selectImage() async {
-    if (kIsWeb) {
-      final base64Image = await _pickImageWeb();
-      if (base64Image != null) {
-        setState(() {
-          _selectedImage = null;
-          _selectedImageBase64 = base64Image;
-        });
-      }
-    } else {
-      final pickedImage = await _pickImageNonWeb();
-      if (pickedImage != null) {
-        setState(() {
-          _selectedImage = pickedImage;
-          _selectedImageBase64 = null;
-        });
-      }
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedImage = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedImage != null) {
+      final Uint8List imageBytes = await pickedImage.readAsBytes();
+      setState(() {
+        _selectedImage = pickedImage;
+        _imageBytes = imageBytes;
+      });
     }
   }
 
@@ -106,11 +64,8 @@ class _ShopFormPageState extends State<ShopFormPage> {
   }
 
   String? _imageToBase64() {
-    if (kIsWeb) {
-      return _selectedImageBase64;
-    } else if (_selectedImage != null) {
-      final bytes = _selectedImage!.readAsBytesSync();
-      return 'data:image/${_selectedImage!.path.split('.').last};base64,${base64Encode(bytes)}';
+    if (_imageBytes != null) {
+      return 'data:image/png;base64,${base64Encode(_imageBytes!)}';
     }
     return null;
   }
@@ -126,8 +81,6 @@ class _ShopFormPageState extends State<ShopFormPage> {
       'profile_image': _imageToBase64(),
     };
 
-    print('Shop Data to Submit: $shopData');
-
     try {
       final response = await request.post(
         'http://m-arvin-sobat.pbp.cs.ui.ac.id/shop/create_shop_flutter/',
@@ -136,9 +89,7 @@ class _ShopFormPageState extends State<ShopFormPage> {
 
       if (response['status'] == 'success') {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content:
-                  Text('Shop "${_nameController.text}" created successfully!')),
+          SnackBar(content: Text('Shop "${_nameController.text}" created successfully!')),
         );
         Navigator.pushReplacement(
           context,
@@ -146,8 +97,7 @@ class _ShopFormPageState extends State<ShopFormPage> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('Failed to create shop: ${response['message']}')),
+          SnackBar(content: Text('Failed to create shop: ${response['message']}')),
         );
       }
     } catch (e) {
@@ -158,14 +108,9 @@ class _ShopFormPageState extends State<ShopFormPage> {
   }
 
   Widget buildImagePreview() {
-    if (_selectedImageBase64 != null) {
+    if (_imageBytes != null) {
       return Image.memory(
-        base64Decode(_selectedImageBase64!.split(',').last),
-        height: 100,
-      );
-    } else if (_selectedImage != null) {
-      return Image.file(
-        _selectedImage!,
+        _imageBytes!,
         height: 100,
       );
     } else {
