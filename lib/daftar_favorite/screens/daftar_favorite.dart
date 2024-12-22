@@ -21,7 +21,7 @@ class ProductListScreen extends StatefulWidget {
 
 class _ProductListScreenState extends State<ProductListScreen> {
   List<FavoriteEntry> favoriteProducts = [];
-  final String baseUrl = 'http://localhost:8000/media/';
+  final String baseUrl = 'https://m-arvin-sobat.pbp.cs.ui.ac.id/media/';
   TextEditingController _newController = new TextEditingController();
   // int totalFavorit = 0;
 
@@ -36,7 +36,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
   }
 
   Future<List<FavoriteEntry>> fetchProduct(CookieRequest request) async {
-    final response = await request.get('http://127.0.0.1:8000/favorite/json/');
+    final response = await request.get('https://m-arvin-sobat.pbp.cs.ui.ac.id/favorite/json/');
     var data = response;
 
     // Melakukan konversi data json menjadi object MoodEntry
@@ -50,7 +50,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
         productPKMap[b] = pk;
 
         final responses =
-            await http.get(Uri.parse('http://127.0.0.1:8000/product/json/$b/'));
+            await http.get(Uri.parse('https://m-arvin-sobat.pbp.cs.ui.ac.id/product/json/$b/'));
         var test = jsonDecode(responses.body);
         var fields = test[0]["fields"];
         productDetailsMap[b] = fields;
@@ -67,7 +67,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Future<void> editFavorite(
       String favoriteId, String newNote, CookieRequest request) async {
     // final response = await request.get('http://127.0.0.1:8000/favorite/api/edit/$favoriteId/');
-    final url = await request.get('http://127.0.0.1:8000/favorite/json/');
+    final url = await request.get('https://m-arvin-sobat.pbp.cs.ui.ac.id/favorite/json/');
     var data = url;
 
     try {
@@ -84,7 +84,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
   Future<DrugModel> fetchDrugDetails(String productId) async {
     final response = await http.get(
-      Uri.parse('http://127.0.0.1:8000/product/json/$productId/'),
+      Uri.parse('https://m-arvin-sobat.pbp.cs.ui.ac.id/product/json/$productId/'),
     );
 
     if (response.statusCode == 200) {
@@ -145,7 +145,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Future<void> deleteProduct(String productId, bool isinProduct) async {
     try {
       final response = await http.delete(
-        Uri.parse('http://127.0.0.1:8000/favorite/api/$productId/'),
+        Uri.parse('https://m-arvin-sobat.pbp.cs.ui.ac.id/favorite/api/$productId/'),
         headers: {
           'Content-Type': 'application/json',
           // Sertakan CSRF token
