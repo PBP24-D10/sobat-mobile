@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sobat_mobile/colors.dart';
 import 'package:sobat_mobile/daftar_favorite/screens/daftar_favorite.dart';
 import 'package:sobat_mobile/daftar_favorite/screens/test.dart';
 import 'package:sobat_mobile/forum/screens/forum.dart';
@@ -18,8 +19,8 @@ class LeftDrawer extends StatelessWidget {
       child: ListView(
         children: [
           DrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.green[300],
+            decoration: const BoxDecoration(
+              color: AppColors.primary,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -28,16 +29,19 @@ class LeftDrawer extends StatelessWidget {
                   'Solo Obat',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.openSans(
-                    textStyle: TextStyle(
+                    textStyle: const TextStyle(
                         fontSize: 30,
-                        color: Colors.black,
+                        color: Colors.white,
                         fontWeight: FontWeight.bold),
                   ),
                 ),
-                Padding(padding: EdgeInsets.all(8)),
                 Text(
                   "Ayo Cari Obat Terbaikmu!",
-                  // TODO: Tambahkan gaya teks dengan center alignment, font ukuran 15, warna putih, dan weight biasa
+                  style: GoogleFonts.openSans(
+                    textStyle: const TextStyle(
+                        color: Colors.white
+                        ),
+                  ),
                 ),
               ],
             ),
