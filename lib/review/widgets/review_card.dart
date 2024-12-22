@@ -13,7 +13,7 @@ class ReviewTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final request = context.read<CookieRequest>();
-    String nama = request.jsonData['username'];
+    int userID = request.jsonData['id'];
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -44,7 +44,7 @@ class ReviewTile extends StatelessWidget {
               style: const TextStyle(color: Color.fromARGB(255, 127, 127, 127)),
             ),
             const SizedBox(height: 16),
-            if (nama == item.username)
+            if (userID == item.user)
               Row(
                 children: [
                   ElevatedButton(

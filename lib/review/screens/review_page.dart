@@ -159,6 +159,12 @@ class _ReviewPageState extends State<ReviewPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Center( child: Image.network(imageUrl, fit: BoxFit.cover,
+                  width: MediaQuery.of(context).size.width - 32,
+                  height: 200,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Text('Unable to load image', textAlign: TextAlign.center);
+                  })),
                   Center(
                     child: Column(
                       children: [
