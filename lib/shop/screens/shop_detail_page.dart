@@ -138,112 +138,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
       }
     });
   }
-
-  Widget _buildOwnerActions() {
-    if (!_isOwner) {
-      return const SizedBox.shrink();
-    }
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-      child: Row(
-        children: [
-          Expanded(
-            child: ElevatedButton.icon(
-              onPressed: _navigateToEditProfile,
-              icon: const Icon(Icons.edit),
-              label: const Text('Edit Profile'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: ElevatedButton.icon(
-              onPressed: _navigateToManageProducts,
-              icon: const Icon(Icons.inventory),
-              label: const Text('Manage Products'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.secondary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text(
-          widget.shop.fields.name,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-        ),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        centerTitle: true,
-        elevation: 0,
-      ),
-      body: RefreshIndicator(
-        onRefresh: _loadDrugs,
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildShopDetails(),
-              _buildOwnerActions(),
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: TextField(
-                  onChanged: _searchDrug,
-                  decoration: InputDecoration(
-                    hintText: 'Search for a product...',
-                    prefixIcon: Icon(Icons.search,
-                        color: Theme.of(context).colorScheme.primary),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-              _error.isNotEmpty
-                  ? _buildErrorWidget()
-                  : _isLoading
-                      ? _buildLoadingWidget()
-                      : _buildDrugList(),
-            ],
-          ),
-        ),
-      ),
-      floatingActionButton: _isOwner
-          ? FloatingActionButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ShopFormPage()),
-                );
-              },
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              child: const Icon(Icons.add, color: Colors.white),
-            )
-          : null,
-    );
-  }
-
+  
   Widget _buildErrorWidget() {
     return Padding(
       padding: const EdgeInsets.all(20.0),
@@ -288,86 +183,289 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
     );
   }
 
-  Widget _buildShopDetails() {
-    return Column(
-      children: [
-        Container(
-          height: 250,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[50],
+      body: CustomScrollView(
+        slivers: [
+          _buildSliverAppBar(),
+          SliverToBoxAdapter(
+            child: RefreshIndicator(
+              color: Colors.green[900],
+              onRefresh: _loadDrugs,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildShopDetails(),
+                  if (_isOwner) _buildOwnerActions(),
+                  _buildSearchBar(),
+                  if (_error.isNotEmpty)
+                    _buildErrorWidget()
+                  else if (_isLoading)
+                    _buildLoadingWidget()
+                  else
+                    _buildDrugList(),
+                ],
+              ),
+            ),
           ),
-          child: widget.shop.fields.profileImage.isNotEmpty
-              ? Image.network(
-                  widget.shop.fields.profileImage.startsWith('http')
-                      ? widget.shop.fields.profileImage
-                      : '$baseUrl${widget.shop.fields.profileImage}',
-                  fit: BoxFit.cover,
-                  headers: const {
-                    'Access-Control-Allow-Origin': '*',
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    print('Error loading shop image: $error');
-                    return Center(
-                      child: Icon(
-                        Icons.storefront,
-                        size: 100,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    );
-                  },
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Center(
-                      child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
-                            : null,
-                      ),
-                    );
-                  },
-                )
-              : Center(
-                  child: Icon(
-                    Icons.storefront,
-                    size: 100,
-                    color: Theme.of(context).colorScheme.primary,
+        ],
+      ),
+      floatingActionButton: _isOwner
+          ? FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ShopFormPage()),
+                );
+              },
+              backgroundColor: Colors.green[900],
+              elevation: 2,
+              child: const Icon(Icons.add, color: Colors.white),
+            )
+          : null,
+    );
+  }
+
+  Widget _buildSliverAppBar() {
+    return SliverAppBar(
+      expandedHeight: 300,
+      pinned: true,
+      stretch: true,
+      backgroundColor: Colors.green[900],
+      flexibleSpace: FlexibleSpaceBar(
+        background: widget.shop.fields.profileImage.isNotEmpty
+            ? Image.network(
+                widget.shop.fields.profileImage.startsWith('http')
+                    ? widget.shop.fields.profileImage
+                    : '$baseUrl${widget.shop.fields.profileImage}',
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    _buildPlaceholderIcon(),
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes!
+                          : null,
+                    ),
+                  );
+                },
+              )
+            : _buildPlaceholderIcon(),
+        title: Text(
+          widget.shop.fields.name,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 24,
+            color: Colors.white,
+          ),
+        ),
+        titlePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      ),
+    );
+  }
+
+  Widget _buildPlaceholderIcon() {
+    return Container(
+      color: Colors.green[100],
+      child: Center(
+        child: Icon(
+          Icons.storefront_outlined,
+          size: 80,
+          color: Colors.green[900]?.withOpacity(0.5),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: TextField(
+        onChanged: _searchDrug,
+        decoration: InputDecoration(
+          hintText: 'Search products...',
+          hintStyle: TextStyle(
+            color: Colors.grey[400],
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+          ),
+          prefixIcon: Icon(Icons.search, color: Colors.green[900], size: 22),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide.none,
+          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOwnerActions() {
+    return Container(
+      margin: const EdgeInsets.only(top: 16, bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildActionButton(
+              onPressed: _navigateToEditProfile,
+              icon: Icons.edit_outlined,
+              label: 'Edit Profile',
+              isDark: true,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _buildActionButton(
+              onPressed: _navigateToManageProducts,
+              icon: Icons.inventory_2_outlined,
+              label: 'Manage Products',
+              isDark: false,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton({
+    required VoidCallback onPressed,
+    required IconData icon,
+    required String label,
+    required bool isDark,
+  }) {
+    return TextButton(
+      onPressed: onPressed,
+      style: TextButton.styleFrom(
+        backgroundColor: isDark ? Colors.green[900] : Colors.green[50],
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            color: isDark ? Colors.white : Colors.green[900],
+            size: 20,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: TextStyle(
+              color: isDark ? Colors.white : Colors.green[900],
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShopDetails() {
+    return Container(
+      margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildInfoCard(
+            icon: Icons.location_on_outlined,
+            title: 'Address',
+            content: widget.shop.fields.address,
+          ),
+          const SizedBox(height: 12),
+          _buildInfoCard(
+            icon: Icons.access_time_outlined,
+            title: 'Operating Hours',
+            content:
+                '${widget.shop.fields.openingTime} - ${widget.shop.fields.closingTime}',
+          ),
+          const SizedBox(height: 12),
+          _buildInfoCard(
+            icon: Icons.calendar_today_outlined,
+            title: 'Established',
+            content: widget.shop.fields.createdAt.toLocal().toString().split(' ')[0],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoCard({
+    required IconData icon,
+    required String title,
+    required String content,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.green[50],
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: Colors.green[900], size: 24),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[600],
+                    letterSpacing: 0.3,
                   ),
                 ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                widget.shop.fields.name,
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 15),
-              DetailRow(
-                icon: Icons.location_on,
-                title: 'Address',
-                content: widget.shop.fields.address,
-              ),
-              const SizedBox(height: 10),
-              DetailRow(
-                icon: Icons.access_time,
-                title: 'Operating Hours',
-                content:
-                    '${widget.shop.fields.openingTime} - ${widget.shop.fields.closingTime}',
-              ),
-              const SizedBox(height: 10),
-              DetailRow(
-                icon: Icons.info_outline,
-                title: 'Established',
-                content: widget.shop.fields.createdAt.toLocal().toString().split(' ')[0],
-              ),
-            ],
+                const SizedBox(height: 4),
+                Text(
+                  content,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    height: 1.3,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -423,28 +521,42 @@ class DetailRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, color: Theme.of(context).colorScheme.primary, size: 24),
-        const SizedBox(width: 15),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                content,
-                style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-              ),
-            ],
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.green[50],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: Colors.green[900], size: 24),
+          const SizedBox(width: 15),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green[900],
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  content,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey[800],
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

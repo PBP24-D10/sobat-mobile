@@ -65,6 +65,8 @@ class DrugEntry {
       shops: json["shops"] != null ? List<String>.from(json["shops"].map((x) => x)) : [],
     );
 
+  get description => null;
+
 
     Map<String, dynamic> toJson() => {
         "name": name,

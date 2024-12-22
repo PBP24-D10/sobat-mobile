@@ -1,11 +1,9 @@
-// shop/widgets/drug_card
-
 import 'package:flutter/material.dart';
 import 'package:sobat_mobile/drug/models/drug_entry.dart';
 
 class DrugCard extends StatelessWidget {
   final DrugModel drug;
-  static const String baseUrl = 'http://m-arvin-sobat.pbp.cs.ui.ac.id'; 
+  static const String baseUrl = 'http://m-arvin-sobat.pbp.cs.ui.ac.id';
 
   const DrugCard({super.key, required this.drug});
 
@@ -13,7 +11,6 @@ class DrugCard extends StatelessWidget {
     if (imagePath.isEmpty) return '';
     if (imagePath.startsWith('http')) return imagePath;
     
-    // Encode the image path to handle spaces and special characters
     final encodedPath = Uri.encodeFull(imagePath);
     return '$baseUrl/media/${encodedPath.startsWith('/') ? encodedPath.substring(1) : encodedPath}';
   }
@@ -21,71 +18,124 @@ class DrugCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final imageUrl = _getImageUrl(drug.fields.image);
-    print('Drug Image URL: $imageUrl'); // For debugging
-
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 3,
-      child: ListTile(
-        leading: Container(
-          width: 50,
-          height: 50,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: Colors.grey[200],
+    
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: (Colors.green[900] ?? Colors.green).withOpacity(0.15),
+            offset: const Offset(0, 4),
+            blurRadius: 12,
+            spreadRadius: 0,
           ),
-          child: drug.fields.image.isNotEmpty
-              ? Image.network(
-                  imageUrl,
-                  width: 50,
-                  height: 50,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    print('Error loading drug image: $error');
-                    return const Icon(
-                      Icons.local_pharmacy,
-                      color: Colors.grey,
-                      size: 30,
-                    );
-                  },
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                      ),
-                    );
-                  },
-                )
-              : const Icon(
-                  Icons.local_pharmacy,
-                  color: Colors.grey,
-                  size: 30,
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {
+            // Handle tap event
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.green[50],
+                    border: Border.all(
+                      color: Colors.green[100]!,
+                      width: 1,
+                    ),
+                  ),
+                  child: drug.fields.image.isNotEmpty
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(
+                            imageUrl,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Icon(
+                                Icons.local_pharmacy,
+                                color: Colors.green[300],
+                                size: 36,
+                              );
+                            },
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.green[700]!,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        )
+                      : Icon(
+                          Icons.local_pharmacy,
+                          color: Colors.green[300],
+                          size: 36,
+                        ),
                 ),
-        ),
-        title: Text(
-          drug.fields.name,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Category: ${drug.fields.category}",
-              style: const TextStyle(fontSize: 14, color: Colors.black54),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        drug.fields.name,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.green[900],
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.green[50],
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          drug.fields.category,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.green[700],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Rp ${drug.fields.price.toString()}",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.green[800],
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            Text(
-              "Price: Rp ${drug.fields.price.toString()}",
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.black54,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
+          ),
         ),
-        isThreeLine: true,
       ),
     );
   }

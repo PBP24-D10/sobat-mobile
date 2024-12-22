@@ -57,59 +57,91 @@ class _ShopMainPageState extends State<ShopMainPage> {
             fontWeight: FontWeight.w600,
           ),
         ),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: Colors.green[900]?.withOpacity(0.8),
         centerTitle: true,
       ),
       drawer: const LeftDrawer(),
-      body: FutureBuilder(
-        future: fetchShops(request),
-        builder: (context, AsyncSnapshot<List<ShopEntry>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                "Error: ${snapshot.error}",
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.red,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.green[50] ?? Colors.white,
+              Colors.white,
+            ],
+          ),
+        ),
+        child: FutureBuilder(
+          future: fetchShops(request),
+          builder: (context, AsyncSnapshot<List<ShopEntry>> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(
+                  color: Colors.green[900],
                 ),
-              ),
-            );
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text(
-                'No shops available.',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey,
+              );
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Text(
+                  "Error: ${snapshot.error}",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.red[700],
+                  ),
                 ),
-              ),
-            );
-          } else {
-            return ListView.builder(
-              padding: const EdgeInsets.all(8),
-              itemCount: snapshot.data!.length,
-              itemBuilder: (_, index) {
-                final shop = snapshot.data![index];
-                return ShopCard(shop: shop);
-              },
-            );
-          }
-        },
+              );
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return Center(
+                child: Text(
+                  'No shops available.',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green[900]?.withOpacity(0.6),
+                  ),
+                ),
+              );
+            } else {
+              return ListView.builder(
+                padding: const EdgeInsets.all(8),
+                itemCount: snapshot.data!.length,
+                itemBuilder: (_, index) {
+                  final shop = snapshot.data![index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: ShopCard(shop: shop),
+                  );
+                },
+              );
+            }
+          },
+        ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          print("FAB pressed"); // Debug print
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => const ShopFormPage()),
-          );
-        },
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        child: const Icon(Icons.add, color: Colors.white),
+      floatingActionButton: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30),
+          boxShadow: [
+            BoxShadow(
+              color: (Colors.green[900] ?? Colors.green).withOpacity(0.3),
+              spreadRadius: 2,
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: FloatingActionButton(
+          onPressed: () {
+            print("FAB pressed"); // Debug print
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const ShopFormPage()),
+            );
+          },
+          backgroundColor: Colors.green[900]?.withOpacity(0.8),
+          child: const Icon(Icons.add, color: Colors.white),
+        ),
       ),
     );
   }
