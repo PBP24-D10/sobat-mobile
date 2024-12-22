@@ -109,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
 
                       // Cek kredensial
                       final response = await request
-                          .login("https://localhost:8000/login_mobile/", {
+                          .login("http://127.0.0.1:8000/login_mobile/", {
                         'username': username,
                         'password': password,
                       });
@@ -117,12 +117,6 @@ class _LoginPageState extends State<LoginPage> {
                       if (request.loggedIn) {
                         String message = response['message'];
                         String uname = response['username'];
-                        int userId = response['user_id']; // Ambil user_id dari respons
-
-                        // Simpan user_id ke SharedPreferences
-                        final prefs = await SharedPreferences.getInstance();
-                        await prefs.setInt('user_id', userId);
-
                         if (context.mounted) {
                           Navigator.pushReplacement(
                             context,
