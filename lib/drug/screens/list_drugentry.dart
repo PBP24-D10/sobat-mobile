@@ -19,10 +19,10 @@ class DrugEntryPage extends StatefulWidget {
 
 class _DrugEntryPageState extends State<DrugEntryPage> {
   // Define the base URL for images
-  final String baseUrl = 'http://m-arvin-sobat.pbp.cs.ui.ac.id/media/';
+  final String baseUrl = 'http://127.0.0.1:8000/media/';
 
   Future<List<DrugModel>> fetchProductEntries(CookieRequest request) async {
-    final response = await request.get('http://m-arvin-sobat.pbp.cs.ui.ac.id/product/json/');
+    final response = await request.get('http://127.0.0.1:8000/product/json/');
     var data = response;
 
     List<DrugModel> listProduct = [];

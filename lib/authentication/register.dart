@@ -154,7 +154,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   }
 
                   final response = await request.postJson(
-                    "http://10.0.2.2:8000/register_mobile/",  // Updated URL for Android emulator
+                    "http://127.0.0.1:8000/register_mobile/",  // Updated URL for Android emulator
                     jsonEncode({
                       "nama": _namaController.text,
                       "username": _usernameController.text,

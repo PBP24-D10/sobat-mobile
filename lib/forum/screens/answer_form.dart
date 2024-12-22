@@ -22,14 +22,14 @@ class _AnswerFormPageState extends State<AnswerFormPage> {
   String _drugAns = "-1";
   DrugModel? _selectedDrug;
   final TextEditingController _answer = TextEditingController();
-  final String baseUrl = 'https://m-arvin-sobat.pbp.cs.ui.ac.id/media/';
+  final String baseUrl = 'http://127.0.0.1:8000/media/';
 
   final Color primaryGreen = AppColors.primary;
   final Color secondaryGreen = AppColors.secondary;
   final Color backgroundGreen = AppColors.background;
 
   Future<List<DrugModel>> fetchProductEntries(CookieRequest request) async {
-    final response = await request.get('https://m-arvin-sobat.pbp.cs.ui.ac.id/product/json/');
+    final response = await request.get('http://127.0.0.1:8000/product/json/');
     List<DrugModel> listProduct = [];
     for (var d in response) {
       if (d != null) {
@@ -540,7 +540,7 @@ class _AnswerFormPageState extends State<AnswerFormPage> {
                                       onPressed: () async {
                                         if (_formKey.currentState!.validate()) {
                                           final response = await request.postJson(
-                                            "https://m-arvin-sobat.pbp.cs.ui.ac.id/forum/answer_question_flutter/${widget.question.pk}/$_drugAns/",
+                                            "http://127.0.0.1:8000/forum/answer_question_flutter/${widget.question.pk}/$_drugAns/",
                                             jsonEncode(<String, String>{
                                               'answer': _answer.text,
                                             }),
