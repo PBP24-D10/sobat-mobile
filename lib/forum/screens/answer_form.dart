@@ -4,21 +4,24 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:sobat_mobile/colors.dart';
 import 'package:sobat_mobile/drug/models/drug_entry.dart';
+import 'package:sobat_mobile/forum/models/question_entry.dart';
+import 'package:sobat_mobile/forum/screens/answers.dart';
 import 'package:sobat_mobile/forum/screens/forum.dart';
 
-class QuestionFormPage extends StatefulWidget {
-  const QuestionFormPage({super.key});
+class AnswerFormPage extends StatefulWidget {
+  final Question question;
+
+  const AnswerFormPage({super.key, required this.question});
 
   @override
-  State<QuestionFormPage> createState() => _QuestionFormPageState();
+  State<AnswerFormPage> createState() => _AnswerFormPageState();
 }
 
-class _QuestionFormPageState extends State<QuestionFormPage> {
+class _AnswerFormPageState extends State<AnswerFormPage> {
   final _formKey = GlobalKey<FormState>();
-  String _drugAsked = "-1";
+  String _drugAns = "-1";
   DrugModel? _selectedDrug;
-  final TextEditingController _questionTitle = TextEditingController();
-  final TextEditingController _question = TextEditingController();
+  final TextEditingController _answer = TextEditingController();
   final String baseUrl = 'http://127.0.0.1:8000/media/';
 
   final Color primaryGreen = AppColors.primary;
@@ -195,7 +198,7 @@ class _QuestionFormPageState extends State<QuestionFormPage> {
                         return GestureDetector(
                           onTap: () {
                             this.setState(() {
-                              _drugAsked = filteredProducts[index].pk.toString();
+                              _drugAns = filteredProducts[index].pk.toString();
                               _selectedDrug = filteredProducts[index];
                             });
                             Navigator.of(context).pop();
@@ -273,7 +276,7 @@ class _QuestionFormPageState extends State<QuestionFormPage> {
       backgroundColor: backgroundGreen,
       appBar: AppBar(
         title: const Text(
-          'Ask a Question',
+          'Answer The Question',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: primaryGreen,
@@ -297,13 +300,101 @@ class _QuestionFormPageState extends State<QuestionFormPage> {
               ),
             ),
             child: const Text(
-              "Share your questions with the community and get helpful answers!",
+              "Provide helpful answers and share your expertise to guide others in the community!",
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Question content
+                IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (widget.question.fields.drugAsked != "") ...[
+                        SizedBox(
+                          width: 80,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildDrugImage(widget.question.fields.drugAsked),
+                              const SizedBox(height: 8),
+                              _buildDrugName(widget.question.fields.drugAsked),
+                            ],
+                          ),
+                        ),
+                      ],
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  "by ${widget.question.fields.username}",
+                                  style: const TextStyle(
+                                    color: Color.fromARGB(255, 47, 47, 47),
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                if (widget.question.fields.role == "apoteker")
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: primaryGreen,
+                                        width: 1.0,
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      "Apoteker",
+                                      style: TextStyle(
+                                        fontSize: 13.0,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color.fromARGB(255, 47, 47, 47),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              widget.question.fields.questionTitle,
+                              style: const TextStyle(
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              widget.question.fields.question,
+                              style: const TextStyle(
+                                fontSize: 15.0,
+                                height: 1.4,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 16),
@@ -333,7 +424,7 @@ class _QuestionFormPageState extends State<QuestionFormPage> {
                             padding: const EdgeInsets.symmetric(horizontal: 16.0),
                             child: Center(
                               child: Text(
-                                "Choose an item to ask about if necessary!",
+                                "Choose an item to answer if necessary!",
                                 style: TextStyle(
                                   color: primaryGreen,
                                   fontSize: 16,
@@ -363,14 +454,14 @@ class _QuestionFormPageState extends State<QuestionFormPage> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(
-                                      _drugAsked == "-1"
+                                      _drugAns == "-1"
                                           ? Icons.add_circle_outline
                                           : Icons.edit,
                                       size: 20,
                                     ),
                                     const SizedBox(width: 8),
                                     Text(
-                                      _drugAsked == "-1"
+                                      _drugAns == "-1"
                                           ? "Select Drug"
                                           : "Change Drug",
                                       style: const TextStyle(
@@ -402,38 +493,11 @@ class _QuestionFormPageState extends State<QuestionFormPage> {
                                 Padding(
                                   padding: const EdgeInsets.all(16.0),
                                   child: TextFormField(
-                                    controller: _questionTitle,
-                                    decoration: InputDecoration(
-                                      hintText: "Enter your question title",
-                                      labelText: "Question Title",
-                                      labelStyle: TextStyle(color: primaryGreen),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12.0),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                          color: primaryGreen,
-                                          width: 2,
-                                        ),
-                                      ),
-                                    ),
-                                    validator: (String? value) {
-                                      if (value == null || value.isEmpty) {
-                                        return "Question title cannot be empty!";
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: TextFormField(
-                                    controller: _question,
+                                    controller: _answer,
                                     maxLines: 5,
                                     decoration: InputDecoration(
-                                      hintText: "Describe your question in detail",
-                                      labelText: "Question Details",
+                                      hintText: "Make a helpful answer!",
+                                      labelText: "Answer",
                                       labelStyle: TextStyle(color: primaryGreen),
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12.0),
@@ -448,7 +512,7 @@ class _QuestionFormPageState extends State<QuestionFormPage> {
                                     ),
                                     validator: (String? value) {
                                       if (value == null || value.isEmpty) {
-                                        return "Question details cannot be empty!";
+                                        return "Answer cannot be empty!";
                                       }
                                       return null;
                                     },
@@ -476,10 +540,9 @@ class _QuestionFormPageState extends State<QuestionFormPage> {
                                       onPressed: () async {
                                         if (_formKey.currentState!.validate()) {
                                           final response = await request.postJson(
-                                            "http://127.0.0.1:8000/forum/add_question_flutter/$_drugAsked/",
+                                            "http://127.0.0.1:8000/forum/answer_question_flutter/${widget.question.pk}/$_drugAns/",
                                             jsonEncode(<String, String>{
-                                              'question_title': _questionTitle.text,
-                                              'question': _question.text,
+                                              'answer': _answer.text,
                                             }),
                                           );
 
@@ -488,7 +551,7 @@ class _QuestionFormPageState extends State<QuestionFormPage> {
                                               ScaffoldMessenger.of(context).showSnackBar(
                                                 SnackBar(
                                                   content: const Text(
-                                                    "Question successfully added!",
+                                                    "Answer successfully added!",
                                                     style: TextStyle(color: Colors.white),
                                                   ),
                                                   backgroundColor: primaryGreen,
@@ -501,7 +564,7 @@ class _QuestionFormPageState extends State<QuestionFormPage> {
                                               Navigator.pushReplacement(
                                                 context,
                                                 MaterialPageRoute(
-                                                  builder: (context) => const ForumPage(),
+                                                  builder: (context) => AnswersPage(question: widget.question),
                                                 ),
                                               );
                                             } else {
@@ -528,7 +591,7 @@ class _QuestionFormPageState extends State<QuestionFormPage> {
                                           Icon(Icons.send, size: 20),
                                           SizedBox(width: 8),
                                           Text(
-                                            "Post Question",
+                                            "Post Answer",
                                             style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold,
@@ -573,6 +636,63 @@ class _QuestionFormPageState extends State<QuestionFormPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildDrugImage(String drugAnsJson) {
+    Map<String, dynamic> drugInfo = json.decode(drugAnsJson);
+    return Container(
+      height: 80,
+      width: 80,
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: primaryGreen,
+          width: 1.0,
+        ),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Image.network(
+          baseUrl + drugInfo["image"],
+          height: 80,
+          width: 80,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              height: 80,
+              width: 80,
+              decoration: BoxDecoration(
+                color: secondaryGreen.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: Icon(
+                  Icons.image_not_supported,
+                  color: primaryGreen,
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDrugName(String drugAnsJson) {
+    Map<String, dynamic> drugInfo = json.decode(drugAnsJson);
+    return Center(
+      child: Text(
+        drugInfo["name"],
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 14.0,
+          fontWeight: FontWeight.w500,
+          color: primaryGreen,
+        ),
+        overflow: TextOverflow.ellipsis,
+        maxLines: 2,
       ),
     );
   }

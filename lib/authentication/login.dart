@@ -14,9 +14,6 @@ class LoginApp extends StatelessWidget {
       title: 'Login',
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSwatch(
-          primarySwatch: Colors.deepPurple,
-        ).copyWith(secondary: Colors.deepPurple[400]),
       ),
       home: const LoginPage(),
     );
@@ -31,10 +28,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController _namaController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _roleController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Text(
                 "SOBAT",
                 style: GoogleFonts.openSans(
-                  textStyle: TextStyle(
+                  textStyle: const TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
                   ),
@@ -63,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
             Text(
               "Log in on Sobat :)",
               style: GoogleFonts.openSans(
-                textStyle: TextStyle(
+                textStyle: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w300,
                 ),
@@ -181,7 +176,7 @@ class _LoginPageState extends State<LoginPage> {
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
                       minimumSize: Size(double.infinity, 50),
-                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      backgroundColor: Theme.of(context).primaryColor,
                       padding: const EdgeInsets.symmetric(vertical: 16.0),
                     ),
                     child: const Text('Login'),
@@ -190,13 +185,14 @@ class _LoginPageState extends State<LoginPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
+                      const Text(
                         'Don\'t have an account?',
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
+                          color: Colors.black,
                           fontSize: 16.0,
                         ),
                       ),
+                      const SizedBox(width: 4),
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
