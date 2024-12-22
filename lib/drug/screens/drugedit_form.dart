@@ -6,6 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:sobat_mobile/drug/models/drug_entry.dart';
+
 
 class EditDrugForm extends StatefulWidget {
   final String productId; // The primary key of the product to edit
@@ -28,8 +30,7 @@ class _EditDrugFormState extends State<EditDrugForm> {
   String? _imageName;
   bool _isLoading = true; // To handle loading state
   String? existingImageUrl;
-  final String baseUrl =
-      'https://m-arvin-sobat.pbp.cs.ui.ac.id/media/'; // Adjust if needed
+  final String baseUrl = 'https://m-arvin-sobat.pbp.cs.ui.ac.id/media/'; // Adjust if needed
 
   @override
   void initState() {
@@ -39,21 +40,26 @@ class _EditDrugFormState extends State<EditDrugForm> {
 
   Future<void> fetchExistingData() async {
     try {
+      // print('error');
+      // print(widget.productId);
       final response = await http.get(Uri.parse(
-          'https://m-arvin-sobat.pbp.cs.ui.ac.id/product/json/${widget.productId}/')); // Adjust endpoint
+        'https://m-arvin-sobat.pbp.cs.ui.ac.id/product/json/${widget.productId}/')); // Adjust endpoint
       if (response.statusCode == 200) {
-        final data =
-            jsonDecode(response.body); // Ensure jsonDecode is available
-        setState(() {
-          nameController.text = data['fields']['name'];
-          descController.text = data['fields']['desc'];
-          categoryController.text = data['fields']['category'];
-          drugTypeController.text = data['fields']['drug_type'];
-          drugFormController.text = data['fields']['drug_form'];
-          priceController.text = data['fields']['price'].toString();
-          existingImageUrl = '$baseUrl${data['fields']['image']}';
-          _isLoading = false;
-        });
+        final List<DrugModel> data = welcomeFromJson(response.body);
+        print('Fetched DrugModel Data: ${data[0].toJson()}'); // Debugging
+
+        if (data.isNotEmpty) {
+          final drug = data[0].fields;
+          setState(() {
+            nameController.text = drug.name;
+            descController.text = drug.desc;
+            categoryController.text = drug.category;
+            drugTypeController.text = drug.drugType;
+            drugFormController.text = drug.drugForm;
+            priceController.text = drug.price.toString();
+            existingImageUrl = '$baseUrl${drug.image}';
+            _isLoading = false;
+          });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to load product data')),
@@ -61,9 +67,10 @@ class _EditDrugFormState extends State<EditDrugForm> {
         setState(() {
           _isLoading = false;
         });
+        }
       }
     } catch (e) {
-      print('Error fetching product data: $e');
+      print('Error fetching product data: $e, ${widget.productId}');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('An error occurred while fetching data')),
       );
@@ -99,7 +106,7 @@ class _EditDrugFormState extends State<EditDrugForm> {
   Future<void> submitEdit() async {
     if (_formKey.currentState!.validate()) {
       var uri = Uri.parse(
-          'https://m-arvin-sobat.pbp.cs.ui.ac.id/edit-drug-ajax/${widget.productId}/');
+          'https://m-arvin-sobat.pbp.cs.ui.ac.id/product/edit-drug-ajax/${widget.productId}/');
       var request = http.MultipartRequest('POST', uri)
         ..fields['name'] = nameController.text
         ..fields['desc'] = descController.text
@@ -109,7 +116,8 @@ class _EditDrugFormState extends State<EditDrugForm> {
         ..fields['price'] = priceController.text;
 
       if (_image != null && _imageName != null) {
-        request.files.add(http.MultipartFile.fromBytes('image', _image!,
+        request.files.add(http.MultipartFile.fromBytes(
+            'image', _image!,
             filename: _imageName));
       }
 

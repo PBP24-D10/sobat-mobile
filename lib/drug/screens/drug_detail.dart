@@ -95,8 +95,8 @@ class ProductDetailPage extends StatelessWidget {
                 child: Image.network(
                   imageUrl,
                   fit: BoxFit.cover,
-                  width: MediaQuery.of(context).size.width - 32,
-                  height: 200,
+                  width: 600,
+                  height: 600,
                   errorBuilder: (context, error, stackTrace) {
                     return Text('Unable to load image',
                         textAlign: TextAlign.center);
