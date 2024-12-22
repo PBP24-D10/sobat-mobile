@@ -165,7 +165,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   // Untuk menyambungkan Android emulator dengan Django pada localhost,
                   // gunakan URL http://10.0.2.2/
                   final response = await request.postJson(
-                      "http://127.0.0.1:8000//register_mobile/",
+                      "https://m-arvin-sobat.pbp.cs.ui.ac.id/register_mobile/",
                       jsonEncode({
                         "nama": nama,
                         "username": username,

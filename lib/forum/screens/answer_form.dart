@@ -22,14 +22,15 @@ class _AnswerFormPageState extends State<AnswerFormPage> {
   String _drugAns = "-1";
   DrugModel? _selectedDrug;
   final TextEditingController _answer = TextEditingController();
-  final String baseUrl = 'http://127.0.0.1:8000/media/';
+  final String baseUrl = 'https://m-arvin-sobat.pbp.cs.ui.ac.id/media/';
 
   final Color primaryGreen = AppColors.primary;
   final Color secondaryGreen = AppColors.secondary;
   final Color backgroundGreen = AppColors.background;
 
   Future<List<DrugModel>> fetchProductEntries(CookieRequest request) async {
-    final response = await request.get('http://127.0.0.1:8000/product/json/');
+    final response = await request
+        .get('https://m-arvin-sobat.pbp.cs.ui.ac.id/product/json/');
     List<DrugModel> listProduct = [];
     for (var d in response) {
       if (d != null) {
@@ -188,7 +189,8 @@ class _AnswerFormPageState extends State<AnswerFormPage> {
                     child: GridView.builder(
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount:
-                            (MediaQuery.of(context).size.width ~/ 150).clamp(2, 4),
+                            (MediaQuery.of(context).size.width ~/ 150)
+                                .clamp(2, 4),
                         crossAxisSpacing: 12.0,
                         mainAxisSpacing: 12.0,
                         childAspectRatio: 0.75,
@@ -225,11 +227,14 @@ class _AnswerFormPageState extends State<AnswerFormPage> {
                                       top: Radius.circular(12),
                                     ),
                                     child: Image.network(
-                                      baseUrl + filteredProducts[index].fields.image,
+                                      baseUrl +
+                                          filteredProducts[index].fields.image,
                                       fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) {
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
                                         return Container(
-                                          color: secondaryGreen.withOpacity(0.2),
+                                          color:
+                                              secondaryGreen.withOpacity(0.2),
                                           child: Icon(
                                             Icons.image_not_supported,
                                             color: primaryGreen,
@@ -401,7 +406,8 @@ class _AnswerFormPageState extends State<AnswerFormPage> {
           Expanded(
             child: FutureBuilder<List<DrugModel>>(
               future: fetchProductEntries(request),
-              builder: (BuildContext context, AsyncSnapshot<List<DrugModel>> snapshot) {
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<DrugModel>> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
@@ -421,59 +427,60 @@ class _AnswerFormPageState extends State<AnswerFormPage> {
                         children: [
                           _buildSelectedDrugCard(),
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                            child: Center(
-                              child: Text(
-                                "Choose an item to answer if necessary!",
-                                style: TextStyle(
-                                  color: primaryGreen,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: Center(
+                                child: Text(
+                                  "Choose an item to answer if necessary!",
+                                  style: TextStyle(
+                                    color: primaryGreen,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                            )
-                          ),
+                              )),
                           const SizedBox(height: 16),
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                            child: Center(
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: primaryGreen,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 24,
-                                    vertical: 12,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                onPressed: () => _selectDrug(context, products),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      _drugAns == "-1"
-                                          ? Icons.add_circle_outline
-                                          : Icons.edit,
-                                      size: 20,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: Center(
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: primaryGreen,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 24,
+                                      vertical: 12,
                                     ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      _drugAns == "-1"
-                                          ? "Select Drug"
-                                          : "Change Drug",
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  onPressed: () =>
+                                      _selectDrug(context, products),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        _drugAns == "-1"
+                                            ? Icons.add_circle_outline
+                                            : Icons.edit,
+                                        size: 20,
                                       ),
-                                    ),
-                                  ],
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        _drugAns == "-1"
+                                            ? "Select Drug"
+                                            : "Change Drug",
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            )
-                          ),
+                              )),
                           Container(
                             margin: const EdgeInsets.all(16.0),
                             decoration: BoxDecoration(
@@ -498,12 +505,15 @@ class _AnswerFormPageState extends State<AnswerFormPage> {
                                     decoration: InputDecoration(
                                       hintText: "Make a helpful answer!",
                                       labelText: "Answer",
-                                      labelStyle: TextStyle(color: primaryGreen),
+                                      labelStyle:
+                                          TextStyle(color: primaryGreen),
                                       border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12.0),
+                                        borderRadius:
+                                            BorderRadius.circular(12.0),
                                       ),
                                       focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12.0),
+                                        borderRadius:
+                                            BorderRadius.circular(12.0),
                                         borderSide: BorderSide(
                                           color: primaryGreen,
                                           width: 2,
@@ -533,51 +543,67 @@ class _AnswerFormPageState extends State<AnswerFormPage> {
                                           vertical: 16,
                                         ),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(12),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                         ),
                                         elevation: 2,
                                       ),
                                       onPressed: () async {
                                         if (_formKey.currentState!.validate()) {
-                                          final response = await request.postJson(
-                                            "http://127.0.0.1:8000/forum/answer_question_flutter/${widget.question.pk}/$_drugAns/",
+                                          final response =
+                                              await request.postJson(
+                                            "https://m-arvin-sobat.pbp.cs.ui.ac.id/forum/answer_question_flutter/${widget.question.pk}/$_drugAns/",
                                             jsonEncode(<String, String>{
                                               'answer': _answer.text,
                                             }),
                                           );
 
                                           if (context.mounted) {
-                                            if (response['status'] == 'success') {
-                                              ScaffoldMessenger.of(context).showSnackBar(
+                                            if (response['status'] ==
+                                                'success') {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
                                                 SnackBar(
                                                   content: const Text(
                                                     "Answer successfully added!",
-                                                    style: TextStyle(color: Colors.white),
+                                                    style: TextStyle(
+                                                        color: Colors.white),
                                                   ),
                                                   backgroundColor: primaryGreen,
-                                                  behavior: SnackBarBehavior.floating,
+                                                  behavior:
+                                                      SnackBarBehavior.floating,
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(10),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
                                                   ),
                                                 ),
                                               );
                                               Navigator.pushReplacement(
                                                 context,
                                                 MaterialPageRoute(
-                                                  builder: (context) => AnswersPage(question: widget.question),
+                                                  builder: (context) =>
+                                                      AnswersPage(
+                                                          question:
+                                                              widget.question),
                                                 ),
                                               );
                                             } else {
-                                              ScaffoldMessenger.of(context).showSnackBar(
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
                                                 SnackBar(
                                                   content: const Text(
                                                     "An error occurred, please try again.",
-                                                    style: TextStyle(color: Colors.white),
+                                                    style: TextStyle(
+                                                        color: Colors.white),
                                                   ),
                                                   backgroundColor: Colors.red,
-                                                  behavior: SnackBarBehavior.floating,
+                                                  behavior:
+                                                      SnackBarBehavior.floating,
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(10),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
                                                   ),
                                                 ),
                                               );
@@ -586,7 +612,8 @@ class _AnswerFormPageState extends State<AnswerFormPage> {
                                         }
                                       },
                                       child: const Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
                                           Icon(Icons.send, size: 20),
                                           SizedBox(width: 8),
