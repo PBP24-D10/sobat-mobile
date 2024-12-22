@@ -27,9 +27,7 @@ class _RegisterPageState extends State<RegisterPage> {
         title: const Text('Register'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Padding(
@@ -40,10 +38,14 @@ class _RegisterPageState extends State<RegisterPage> {
               Text(
                 "Sign Up",
                 style: GoogleFonts.openSans(
-                    textStyle:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              Container(height: 200, child: Image.asset("assets/login.png")),
+              Container(
+                height: 200,
+                child: Image.asset("assets/login.png"),
+              ),
               const SizedBox(height: 10.0),
               TextFormField(
                 controller: _namaController,
@@ -119,6 +121,9 @@ class _RegisterPageState extends State<RegisterPage> {
                   if (value == null || value.isEmpty) {
                     return 'Please confirm your password';
                   }
+                  if (value != _passwordController.text) {
+                    return 'Passwords do not match';
+                  }
                   return null;
                 },
               ),
@@ -146,39 +151,30 @@ class _RegisterPageState extends State<RegisterPage> {
               const SizedBox(height: 12.0),
               ElevatedButton(
                 onPressed: () async {
-                  String nama = _namaController.text;
-                  String username = _usernameController.text;
-                  String password1 = _passwordController.text;
-                  String password2 = _confirmPasswordController.text;
-                  String? role = _selectedRole;
-
-                  if (role == null) {
+                  if (_passwordController.text !=
+                      _confirmPasswordController.text) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Please select a role!'),
-                      ),
+                      const SnackBar(content: Text('Passwords do not match!')),
                     );
                     return;
                   }
 
-                  // Cek kredensial
-                  // Untuk menyambungkan Android emulator dengan Django pada localhost,
-                  // gunakan URL http://10.0.2.2/
                   final response = await request.postJson(
-                      "https://m-arvin-sobat.pbp.cs.ui.ac.id/register_mobile/",
-                      jsonEncode({
-                        "nama": nama,
-                        "username": username,
-                        "password1": password1,
-                        "password2": password2,
-                        "role": role,
-                      }));
+                    "https://m-arvin-sobat.pbp.cs.ui.ac.id/register_mobile/", // Updated URL for Android emulator
+                    jsonEncode({
+                      "nama": _namaController.text,
+                      "username": _usernameController.text,
+                      "password1": _passwordController.text,
+                      "password2": _confirmPasswordController.text,
+                      "role": _selectedRole,
+                    }),
+                  );
+
                   if (context.mounted) {
                     if (response['status'] == 'success') {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Successfully registered!'),
-                        ),
+                            content: Text('Successfully registered!')),
                       );
                       Navigator.pushReplacement(
                         context,
@@ -187,9 +183,9 @@ class _RegisterPageState extends State<RegisterPage> {
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Failed to register!'),
-                        ),
+                        SnackBar(
+                            content: Text(
+                                response['message'] ?? 'Failed to register!')),
                       );
                     }
                   }
@@ -198,9 +194,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   foregroundColor: Colors.white,
                   minimumSize: const Size(double.infinity, 50),
                   backgroundColor: Theme.of(context).colorScheme.primary,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 16.0,
-                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
                 ),
                 child: const Text('Register'),
               ),
@@ -209,5 +203,14 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _namaController.dispose();
+    _usernameController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:quickalert/quickalert.dart';
 import 'package:sobat_mobile/drug/models/drug_entry.dart';
 import 'package:sobat_mobile/drug/widgets/button_review.dart';
 import 'package:sobat_mobile/forum/screens/forum.dart';
@@ -10,6 +12,7 @@ class ProductDetailPage extends StatelessWidget {
   final DrugModel product;
   //  final DrugEntry product;
   final void Function()? detailRoute;
+  final void Function()? onPressed;
 
   String formatedPrice(int price) {
     final formattedPrice = NumberFormat.currency(
@@ -21,10 +24,13 @@ class ProductDetailPage extends StatelessWidget {
   }
 
   const ProductDetailPage(
-      {super.key, required this.product, required this.detailRoute});
+      {super.key,
+      required this.product,
+      required this.detailRoute,
+      required this.onPressed});
 
   // Define the base URL
-  final String baseUrl = 'http://m-arvin-sobat.pbp.cs.ui.ac.id/media/';
+  final String baseUrl = 'https://m-arvin-sobat.pbp.cs.ui.ac.id/media/';
 
   @override
   Widget build(BuildContext context) {
@@ -164,7 +170,7 @@ class ProductDetailPage extends StatelessWidget {
                     fontWeight: FontWeight.bold),
               ),
               GestureDetector(
-                onTap: () {},
+                onTap: onPressed,
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.black,

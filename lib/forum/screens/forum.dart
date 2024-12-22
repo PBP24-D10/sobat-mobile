@@ -126,6 +126,7 @@ class _ForumPageState extends State<ForumPage> {
       if (response['status'] == 'success') {
         setState(() {
           questions.removeWhere((q) => q.pk == question.pk);
+          filteredQuestions.removeWhere((q) => q.pk == question.pk);
         });
 
         ScaffoldMessenger.of(context).showSnackBar(

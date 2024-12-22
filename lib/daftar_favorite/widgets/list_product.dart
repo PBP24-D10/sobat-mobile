@@ -10,6 +10,7 @@ class productTile extends StatefulWidget {
   String category;
   void Function()? onPressed;
   void Function()? detailRoute;
+  void Function()? addCart;
 
   productTile(
       {super.key,
@@ -19,7 +20,8 @@ class productTile extends StatefulWidget {
       required this.onPressed,
       required this.drugForm,
       required this.category,
-      required this.detailRoute});
+      required this.detailRoute,
+      required this.addCart});
 
   @override
   State<productTile> createState() => _productTileState();
@@ -111,7 +113,7 @@ class _productTileState extends State<productTile> {
                       children: [
                         IconButton(
                           icon: Icon(FontAwesomeIcons.cartShopping),
-                          onPressed: () {},
+                          onPressed: widget.addCart,
                         ),
                         IconButton(
                           icon: Icon(FontAwesomeIcons.trash),
