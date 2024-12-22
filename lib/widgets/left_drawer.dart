@@ -55,7 +55,7 @@ class LeftDrawer extends StatelessWidget {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => MyHomePage(),
+                    builder: (context) => const MyHomePage(),
                   ));
             },
           ),
@@ -93,7 +93,7 @@ class LeftDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(FontAwesomeIcons.shop),
-            title: const Text('Store'),
+            title: const Text('Shop'),
             onTap: () {
               Navigator.push(
                 context,
