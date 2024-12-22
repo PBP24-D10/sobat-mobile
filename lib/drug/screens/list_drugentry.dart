@@ -137,7 +137,7 @@ class _DrugEntryPageState extends State<DrugEntryPage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => ProductDetailPage(
-                            product: product.fields,
+                            product: product,
                             detailRoute: () =>
                                 addToFavorite(product.pk, request),
                           ),
