@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:sobat_mobile/colors.dart';
 import 'package:sobat_mobile/drug/models/drug_entry.dart';
 import 'package:sobat_mobile/forum/models/question_entry.dart';
 import 'package:sobat_mobile/forum/screens/answers.dart';
@@ -19,6 +20,10 @@ class _ForumPageState extends State<ForumPage> {
   List<Question> filteredQuestions = [];
   final TextEditingController _searchController = TextEditingController();
   final String baseUrl = 'http://127.0.0.1:8000/media/';
+
+  final Color primaryGreen = AppColors.primary;
+  final Color secondaryGreen = AppColors.secondary;
+  final Color backgroundGreen = AppColors.background;
 
   @override
   void dispose() {
@@ -138,10 +143,6 @@ class _ForumPageState extends State<ForumPage> {
     }
   }
 
-  final Color primaryGreen = const Color(0xFF2E7D32); // darker green
-  final Color secondaryGreen = const Color(0xFF81C784); // lighter green
-  final Color backgroundGreen = const Color(0xFFE8F5E9); // very light green
-
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
@@ -214,7 +215,8 @@ class _ForumPageState extends State<ForumPage> {
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: primaryGreen.withOpacity(0.5)),
+                    borderSide:
+                        BorderSide(color: primaryGreen.withOpacity(0.5)),
                   ),
                 ),
               ),
@@ -287,9 +289,10 @@ class _ForumPageState extends State<ForumPage> {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: filteredQuestions[index].fields.role == "apoteker"
-                            ? const Color.fromARGB(255, 220, 252, 231)
-                            : Colors.white,
+                        color:
+                            filteredQuestions[index].fields.role == "apoteker"
+                                ? const Color.fromARGB(255, 220, 252, 231)
+                                : Colors.white,
                         borderRadius: BorderRadius.circular(15),
                         border: Border.all(
                           color: primaryGreen,
@@ -323,13 +326,15 @@ class _ForumPageState extends State<ForumPage> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          _buildDrugImage(filteredQuestions[index]
-                                              .fields
-                                              .drugAsked),
+                                          _buildDrugImage(
+                                              filteredQuestions[index]
+                                                  .fields
+                                                  .drugAsked),
                                           const SizedBox(height: 8),
-                                          _buildDrugName(filteredQuestions[index]
-                                              .fields
-                                              .drugAsked),
+                                          _buildDrugName(
+                                              filteredQuestions[index]
+                                                  .fields
+                                                  .drugAsked),
                                         ],
                                       ),
                                     ),
@@ -409,8 +414,8 @@ class _ForumPageState extends State<ForumPage> {
                               ),
                             ),
                             const SizedBox(height: 12),
-                            _buildActionButtons(context, filteredQuestions[index],
-                                request, userId),
+                            _buildActionButtons(context,
+                                filteredQuestions[index], request, userId),
                           ],
                         ),
                       ),

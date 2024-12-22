@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:sobat_mobile/colors.dart';
 import 'package:sobat_mobile/drug/models/drug_entry.dart';
 import 'package:sobat_mobile/forum/screens/forum.dart';
 
@@ -20,9 +21,9 @@ class _QuestionFormPageState extends State<QuestionFormPage> {
   final TextEditingController _question = TextEditingController();
   final String baseUrl = 'http://127.0.0.1:8000/media/';
 
-  final Color primaryGreen = const Color(0xFF2E7D32);
-  final Color secondaryGreen = const Color(0xFF81C784);
-  final Color backgroundGreen = const Color(0xFFE8F5E9);
+  final Color primaryGreen = AppColors.primary;
+  final Color secondaryGreen = AppColors.secondary;
+  final Color backgroundGreen = AppColors.background;
 
   Future<List<DrugModel>> fetchProductEntries(CookieRequest request) async {
     final response = await request.get('http://127.0.0.1:8000/product/json/');

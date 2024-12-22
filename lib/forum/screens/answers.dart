@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:sobat_mobile/colors.dart';
 import 'package:sobat_mobile/drug/models/drug_entry.dart';
 import 'package:sobat_mobile/forum/models/answer_entry.dart';
 import 'package:sobat_mobile/forum/models/question_entry.dart';
@@ -27,9 +28,9 @@ class _AnswersPageState extends State<AnswersPage> {
   final TextEditingController _answer = TextEditingController();
   final String baseUrl = 'http://127.0.0.1:8000/media/';
 
-  final Color primaryGreen = const Color(0xFF2E7D32);
-  final Color secondaryGreen = const Color(0xFF81C784);
-  final Color backgroundGreen = const Color(0xFFE8F5E9);
+  final Color primaryGreen = AppColors.primary;
+  final Color secondaryGreen = AppColors.secondary;
+  final Color backgroundGreen = AppColors.background;
 
   Future<List<Answer>> fetchAnswers(CookieRequest request) async {
     String questionId = widget.question.pk;
