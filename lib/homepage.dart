@@ -41,33 +41,6 @@ class _MyHomePageState extends State<MyHomePage> {
           alignment: WrapAlignment.center,
           children: [
             Text("SOBAT"),
-            // IconButton(
-            //   icon: Icon(Icons.logout),
-            // onPressed: () async {
-            //   final response = await request
-            //       .logout("http://127.0.0.1:8000/logout_mobile/");
-            //   String message = response["message"];
-            //   if (context.mounted) {
-            //     if (response['status']) {
-            //       String uname = response["username"];
-            //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            //         content: Text("$message Sampai jumpa, $uname."),
-            //       ));
-            //       Navigator.pushReplacement(
-            //         context,
-            //         MaterialPageRoute(
-            //             builder: (context) => const LoginPage()),
-            //       );
-            //     } else {
-            //       ScaffoldMessenger.of(context).showSnackBar(
-            //         SnackBar(
-            //           content: Text(message),
-            //         ),
-            //       );
-            //     }
-            //   }
-            // },
-            // ),
           ],
         ),
       ),

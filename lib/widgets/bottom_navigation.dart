@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:sobat_mobile/authentication/login.dart';
+import 'package:sobat_mobile/drug/screens/list_drugentry.dart';
 
 class bottomNavigationBar extends StatefulWidget {
   final CookieRequest request;
@@ -53,7 +54,13 @@ class _bottomNavigationBarState extends State<bottomNavigationBar> {
                 iconActiveColor: Colors.white,
                 iconColor: Colors.black,
                 icon: FontAwesomeIcons.prescriptionBottleMedical,
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const DrugEntryPage()),
+                  );
+                },
               ),
               GButton(
                 iconActiveColor: Colors.white,
