@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sobat_mobile/drug/models/drug_entry.dart';
+import 'package:sobat_mobile/drug/screens/drug_detail.dart';
 
 class DrugCard extends StatelessWidget {
   final DrugModel drug;
@@ -10,7 +11,7 @@ class DrugCard extends StatelessWidget {
   String _getImageUrl(String imagePath) {
     if (imagePath.isEmpty) return '';
     if (imagePath.startsWith('http')) return imagePath;
-    
+
     final encodedPath = Uri.encodeFull(imagePath);
     return '$baseUrl/media/${encodedPath.startsWith('/') ? encodedPath.substring(1) : encodedPath}';
   }
@@ -18,7 +19,7 @@ class DrugCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final imageUrl = _getImageUrl(drug.fields.image);
-    
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       decoration: BoxDecoration(
@@ -38,7 +39,18 @@ class DrugCard extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: () {
-            // Handle tap event
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProductDetailPage(
+                  product: drug,
+                  detailRoute: () {
+                    // Optional custom action
+                  }, onPressed: () {  },
+                ),
+                settings: RouteSettings(arguments: {'pk': drug.pk}),
+              ),
+            );
           },
           child: Padding(
             padding: const EdgeInsets.all(16),
