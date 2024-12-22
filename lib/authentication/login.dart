@@ -118,7 +118,6 @@ class _LoginPageState extends State<LoginPage> {
                       if (request.loggedIn) {
                         String message = response['message'];
                         String uname = response['username'];
-
                         if (context.mounted) {
                           Navigator.pushReplacement(
                             context,

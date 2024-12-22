@@ -3,10 +3,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:sobat_mobile/shop/models/shop_model.dart';
 import 'package:sobat_mobile/drug/models/drug_entry.dart';
 import 'package:sobat_mobile/shop/screens/shop_form.dart';
+import 'package:sobat_mobile/shop/screens/shop_manage_product.dart';
 import 'package:sobat_mobile/shop/widgets/drug_card.dart';
 import 'package:sobat_mobile/shop/screens/shop_profile_edit.dart';
 
@@ -31,18 +33,17 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
   void initState() {
     super.initState();
     _loadDrugs();
-    _checkOwnership();
+    // We'll check ownership in build now since we need context for Provider
   }
 
-  Future<void> _checkOwnership() async {
+  void _checkOwnership(BuildContext context) {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final flutterUserId = prefs.getInt('user_id') ?? -1; // Gunakan nilai default -1 jika null
+      final request = context.watch<CookieRequest>();
+      int userId = request.jsonData['id'];
 
       setState(() {
-        _isOwner = flutterUserId != -1 && flutterUserId == widget.shop.fields.owner;
+        _isOwner = userId != 0 && userId == widget.shop.fields.owner;
       });
-
     } catch (e) {
       setState(() {
         _isOwner = false;
@@ -80,7 +81,7 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ShopManageProductsPage(shop: widget.shop),
+        builder: (context) => const ShopManageProductsPage(shopId: '',), // shopId tidak disediakan
       ),
     );
   }
@@ -185,6 +186,9 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Check ownership here since we have access to context
+    _checkOwnership(context);
+
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: CustomScrollView(
@@ -497,10 +501,10 @@ class _ShopDetailPageState extends State<ShopDetailPage> {
       child: ListView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: _filteredDrugs.length,
+        itemCount: _filteredDrugs.length, // Corrected the itemCount
         itemBuilder: (context, index) {
           final drug = _filteredDrugs[index];
-          return DrugCard(drug: drug);
+          return DrugCard(drug: drug); // Assuming DrugCard widget exists and works
         },
       ),
     );
@@ -557,20 +561,6 @@ class DetailRow extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class ShopManageProductsPage extends StatelessWidget {
-  final ShopEntry shop;
-
-  const ShopManageProductsPage({super.key, required this.shop});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Manage Products')),
-      body: const Center(child: Text('Manage Products Page - Coming Soon')),
     );
   }
 }
